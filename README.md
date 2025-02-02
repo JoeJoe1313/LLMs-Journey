@@ -8,8 +8,10 @@ Books:
 Agents:
 - [Agents (Google's whitepaper)](https://www.kaggle.com/whitepaper-agents)
 
-Fine Tuning:
+Fine-Tuning:
 - [LoRA: Low-Rank Adaptation of Large Language Models](https://arxiv.org/pdf/2106.09685)
+
+RAG related:
 - [Chain-of-Retrieval Augmented Generation](https://arxiv.org/pdf/2501.14342)
 
 Evaluation:
