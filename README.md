@@ -10,6 +10,7 @@ Agents:
 
 Fine-Tuning:
 - [LoRA: Low-Rank Adaptation of Large Language Models](https://arxiv.org/pdf/2106.09685)
+- [QLORA: Efficient Finetuning of Quantized LLMs](https://arxiv.org/pdf/2305.14314)
 
 RAG related:
 - [Chain-of-Retrieval Augmented Generation](https://arxiv.org/pdf/2501.14342)
@@ -32,9 +33,12 @@ MLX:
 - [mlx-vlm](https://github.com/Blaizzy/mlx-vlm)
 
 LangChain:
+- [Build a Retrieval Augmented Generation (RAG) App: Part 1](https://python.langchain.com/docs/tutorials/rag/)
+
+LangGraph:
 - l
 
-LangChain:
+LangSmith:
 - l
 
 Ollama:
