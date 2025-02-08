@@ -10,6 +10,7 @@ Agents:
 - [Agents (Google's whitepaper)](https://www.kaggle.com/whitepaper-agents)
 
 Fine-Tuning:
+- [🤗 PEFT: Parameter-Efficient Fine-Tuning of Billion-Scale Models on Low-Resource Hardware](https://huggingface.co/blog/peft)
 - [LoRA: Low-Rank Adaptation of Large Language Models](https://arxiv.org/pdf/2106.09685)
 - [QLORA: Efficient Finetuning of Quantized LLMs](https://arxiv.org/pdf/2305.14314)
 
