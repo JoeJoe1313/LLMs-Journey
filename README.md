@@ -81,3 +81,4 @@ GitHub Repos:
 - [Multimodal-RAG-Implementation](https://github.com/CornelliusYW/Multimodal-RAG-Implementation)
 - [Data_Science_Learning_Material](https://github.com/CornelliusYW/Data_Science_Learning_Material)
 - [RAG-To-Know](https://github.com/CornelliusYW/RAG-To-Know)
+- [Docling](https://github.com/DS4SD/docling?tab=readme-ov-file)
