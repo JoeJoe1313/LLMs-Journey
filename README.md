@@ -4,6 +4,7 @@
 
 Books:
 - [Foundations of Large Language Models](https://arxiv.org/pdf/2501.09223)
+- [How to Scale Your Model](https://jax-ml.github.io/scaling-book/index)
 
 Agents:
 - [Agents (Google's whitepaper)](https://www.kaggle.com/whitepaper-agents)
@@ -26,6 +27,16 @@ Models:
 - [Janus-Pro: Unified Multimodal Understanding and Generation with Data and Model Scaling](https://github.com/deepseek-ai/Janus/blob/main/janus_pro_tech_report.pdf)
 - [RoFormer: Enhanced Transformer with Rotary Position Embedding](https://arxiv.org/pdf/2104.09864) and [Round and Round We Go! What makes Rotary Positional Encodings useful?](https://arxiv.org/pdf/2410.06205)
 
+Chain-of-Thought
+- [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
+- [Self-Consistency Improves Chain of Thought Reasoning in Language Models](https://arxiv.org/abs/2203.11171)
+
+Test-Time Scaling
+- [s1: Simple test-time scaling](https://github.com/simplescaling/s1) and [paper](https://arxiv.org/abs/2501.19393)
+
+Test-Time Comput
+- [Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters](https://arxiv.org/abs/2408.03314)
+
 ## Resources
 
 MLX:
@@ -43,6 +54,9 @@ LangSmith:
 - l
 
 Ollama:
+- l
+
+- LLamaIndex:
 - l
 
 Databases:
