@@ -15,6 +15,7 @@ Fine-Tuning:
 - [QLORA: Efficient Finetuning of Quantized LLMs](https://arxiv.org/pdf/2305.14314)
 
 RAG related:
+- [Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks](https://arxiv.org/abs/2005.11401)
 - [Chain-of-Retrieval Augmented Generation](https://arxiv.org/pdf/2501.14342)
 - [Introducing Contextual Retrieval](https://www.anthropic.com/news/contextual-retrieval)
 
