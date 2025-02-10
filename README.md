@@ -62,7 +62,7 @@ LangSmith:
 Ollama:
 - l
 
-- LLamaIndex:
+LLamaIndex:
 - l
 
 Databases:
