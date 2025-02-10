@@ -16,6 +16,7 @@ Fine-Tuning:
 
 RAG related:
 - [Chain-of-Retrieval Augmented Generation](https://arxiv.org/pdf/2501.14342)
+- [Introducing Contextual Retrieval](https://www.anthropic.com/news/contextual-retrieval)
 
 Evaluation:
 - [A Survey on LLM-as-a-Judge](https://arxiv.org/pdf/2411.15594)
