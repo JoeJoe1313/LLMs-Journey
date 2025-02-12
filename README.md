@@ -40,8 +40,9 @@ Chain-of-Thought
 Test-Time Scaling
 - [s1: Simple test-time scaling](https://github.com/simplescaling/s1) and [paper](https://arxiv.org/abs/2501.19393)
 
-Test-Time Comput
+Test-Time Compute
 - [Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters](https://arxiv.org/abs/2408.03314)
+- [Scaling up Test-Time Compute with Latent Reasoning: A Recurrent Depth Approach](https://arxiv.org/abs/2502.05171)
 
 ## Resources
 
