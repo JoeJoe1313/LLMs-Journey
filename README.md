@@ -37,6 +37,9 @@ Chain-of-Thought
 - [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
 - [Self-Consistency Improves Chain of Thought Reasoning in Language Models](https://arxiv.org/abs/2203.11171)
 
+Visualisation-of-Thought:
+- [Imagine while Reasoning in Space: Multimodal Visualization-of-Thought](https://arxiv.org/pdf/2501.07542)
+
 Test-Time Scaling
 - [s1: Simple test-time scaling](https://github.com/simplescaling/s1) and [paper](https://arxiv.org/abs/2501.19393)
 
