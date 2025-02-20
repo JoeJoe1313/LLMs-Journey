@@ -30,7 +30,7 @@ Models:
 - [Janus-Pro: Unified Multimodal Understanding and Generation with Data and Model Scaling](https://github.com/deepseek-ai/Janus/blob/main/janus_pro_tech_report.pdf)
 - [RoFormer: Enhanced Transformer with Rotary Position Embedding](https://arxiv.org/pdf/2104.09864) and [Round and Round We Go! What makes Rotary Positional Encodings useful?](https://arxiv.org/pdf/2410.06205)
 - [Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution](https://arxiv.org/abs/2409.12191)
-- [Qwen2.5-VL](https://github.com/QwenLM/Qwen2.5-VL?tab=readme-ov-file)
+- [Qwen2.5-VL](https://github.com/QwenLM/Qwen2.5-VL?tab=readme-ov-file) and [paper](https://arxiv.org/abs/2502.13923)
 - [Qwen2.5-Math](https://github.com/QwenLM/Qwen2.5-Math?tab=readme-ov-file) and [paper](https://arxiv.org/abs/2409.12122)
 
 Chain-of-Thought
