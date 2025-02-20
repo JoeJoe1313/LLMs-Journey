@@ -5,9 +5,13 @@
 Books:
 - [Foundations of Large Language Models](https://arxiv.org/pdf/2501.09223)
 - [How to Scale Your Model](https://jax-ml.github.io/scaling-book/index)
+- [The Ultra-Scale Playbook: Training LLMs on GPU Clusters](https://huggingface.co/spaces/nanotron/ultrascale-playbook)
 
 Agents:
+- [Hugging Face Agents Course](https://huggingface.co/agents-course)
+- [ai-agents-for-beginners (Microsoft)](https://github.com/microsoft/ai-agents-for-beginners)
 - [Agents (Google's whitepaper)](https://www.kaggle.com/whitepaper-agents)
+- [Agency Is Frame-Dependent](https://arxiv.org/abs/2502.04403)
 
 Fine-Tuning:
 - [🤗 PEFT: Parameter-Efficient Fine-Tuning of Billion-Scale Models on Low-Resource Hardware](https://huggingface.co/blog/peft)
@@ -23,6 +27,10 @@ Evaluation:
 - [A Survey on LLM-as-a-Judge](https://arxiv.org/pdf/2411.15594)
 - [ARC Prize 2024: Technical Report](https://arxiv.org/pdf/2412.04604)
 - [FrontierMath: A Benchmark for Evaluating Advanced Mathematical Reasoning in AI](https://arxiv.org/pdf/2411.04872)
+- [MATH-Perturb: Benchmarking LLMs' Math Reasoning Abilities against Hard Perturbations](https://arxiv.org/abs/2502.06453v1)
+
+Datasets:
+- [NuminaMath 1.5](https://huggingface.co/datasets/AI-MO/NuminaMath-1.5)
 
 Models:
 - [DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning](https://arxiv.org/pdf/2501.12948)
@@ -32,6 +40,7 @@ Models:
 - [Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution](https://arxiv.org/abs/2409.12191)
 - [Qwen2.5-VL](https://github.com/QwenLM/Qwen2.5-VL?tab=readme-ov-file) and [paper](https://arxiv.org/abs/2502.13923)
 - [Qwen2.5-Math](https://github.com/QwenLM/Qwen2.5-Math?tab=readme-ov-file) and [paper](https://arxiv.org/abs/2409.12122)
+- [PaliGemma 2: A Family of Versatile VLMs for Transfer](https://arxiv.org/abs/2412.03555v1)
 
 Chain-of-Thought
 - [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
@@ -50,9 +59,22 @@ Test-Time Compute
 AlphaGeometry:
 - [Gold-medalist Performance in Solving Olympiad Geometry with AlphaGeometry2](https://arxiv.org/abs/2502.03544)
 
+Apple:
+- [Machine Learning Research at Apple](https://machinelearning.apple.com)
+- [Distillation Scaling Laws](https://arxiv.org/abs/2502.08606)
+- [Parameters vs FLOPs: Scaling Laws for Optimal Sparsity for Mixture-of-Experts Language Models](https://arxiv.org/abs/2501.12370)
+
 Misc:
 - [Scaling Pre-training to One Hundred Billion Data for Vision Language Models](https://arxiv.org/abs/2502.07617)
 - [Competitive Programming with Large Reasoning Models](https://arxiv.org/abs/2502.06807)
+- [MoBA: Mixture of Block Attention for Long-Context LLMs](https://arxiv.org/abs/2502.13189)
+- [Step-Video-T2V Technical Report: The Practice, Challenges, and Future of Video Foundation Model](https://arxiv.org/abs/2502.10248), [repo](https://github.com/stepfun-ai/Step-Video-T2V)
+- [Native Sparse Attention: Hardware-Aligned and Natively Trainable Sparse Attention](https://arxiv.org/abs/2502.11089)
+- [Deepseek Papers](https://huggingface.co/collections/Presidentlin/deepseek-papers-674c536aa6acddd9bc98c2ac)
+- [InfiniteHiP: Extending Language Model Context Up to 3 Million Tokens on a Single GPU](https://arxiv.org/abs/2502.08910)
+- [Leveraging the true depth of LLMs](https://arxiv.org/abs/2502.02790)
+- [NOLIMA: Long-Context Evaluation Beyond Literal Matching](https://arxiv.org/pdf/2502.05167)
+- [Memory Layers at Scale](https://arxiv.org/abs/2412.09764)
 
 ## Resources
 
