@@ -1,10 +1,12 @@
-"""Part of the code below is adapted from https://github.com/google-research/big_vision/blob/main/big_vision/evaluators/proj/paligemma/transfers/segmentation.py.
+"""Part of the code below is adapted from 
+https://github.com/google-research/big_vision/blob/main/big_vision/evaluators/proj/paligemma/transfers/segmentation.py.
 This version uses MLX instead of JAX/Flax.
 """
 
 import functools
 import logging
 import re
+from typing import Any, Callable, Tuple
 
 import matplotlib.pyplot as plt
 import mlx.core as mx
@@ -29,7 +31,7 @@ _KNOWN_MODELS = {
 class ResBlock(nn.Module):
     """Residual block for MLX."""
 
-    def __init__(self, features):
+    def __init__(self, features: int):
         super().__init__()
         self.conv1 = nn.Conv2d(
             in_channels=features, out_channels=features, kernel_size=3, padding=1
@@ -41,90 +43,79 @@ class ResBlock(nn.Module):
             in_channels=features, out_channels=features, kernel_size=1, padding=0
         )
 
-    def __call__(self, x):
+    def __call__(self, x: Any) -> Any:
         original_x = x
-        x = self.conv1(x)
-        x = nn.relu(x)
-        x = self.conv2(x)
-        x = nn.relu(x)
+        x = nn.relu(self.conv1(x))
+        x = nn.relu(self.conv2(x))
         x = self.conv3(x)
         return x + original_x
 
 
 class Decoder(nn.Module):
-    """Upscales quantized vectors to mask in MLX."""
+    """
+    Decoder that upscales quantized vectors to produce a mask.
+    The architecture is parameterized to avoid hardcoded layer definitions.
+    """
 
-    def __init__(self):
+    def __init__(
+        self,
+        in_channels: int = 512,
+        res_channels: int = 128,
+        out_channels: int = 1,
+        num_res_blocks: int = 2,
+        upsample_channels: Tuple[int, ...] = (128, 64, 32, 16),
+    ):
         super().__init__()
         self.conv_in = nn.Conv2d(
-            in_channels=512, out_channels=128, kernel_size=1, padding=0
+            in_channels=in_channels, out_channels=res_channels, kernel_size=1, padding=0
         )
-
-        self.res_blocks = [ResBlock(features=128), ResBlock(features=128)]
-
-        self.upsample1 = nn.ConvTranspose2d(
-            in_channels=128, out_channels=128, kernel_size=4, stride=2, padding=1
-        )
-        self.upsample2 = nn.ConvTranspose2d(
-            in_channels=128, out_channels=64, kernel_size=4, stride=2, padding=1
-        )
-        self.upsample3 = nn.ConvTranspose2d(
-            in_channels=64, out_channels=32, kernel_size=4, stride=2, padding=1
-        )
-        self.upsample4 = nn.ConvTranspose2d(
-            in_channels=32, out_channels=16, kernel_size=4, stride=2, padding=1
-        )
-
+        self.res_blocks = [
+            ResBlock(features=res_channels) for _ in range(num_res_blocks)
+        ]
+        self.upsample_layers = []
+        prev_channels = res_channels
+        for ch in upsample_channels:
+            self.upsample_layers.append(
+                nn.ConvTranspose2d(
+                    in_channels=prev_channels,
+                    out_channels=ch,
+                    kernel_size=4,
+                    stride=2,
+                    padding=1,
+                )
+            )
+            prev_channels = ch
         self.conv_out = nn.Conv2d(
-            in_channels=16, out_channels=1, kernel_size=1, padding=0
+            in_channels=upsample_channels[-1],
+            out_channels=out_channels,
+            kernel_size=1,
+            padding=0,
         )
 
-    def __call__(self, x):
-        x = self.conv_in(x)
-        x = nn.relu(x)
-
-        for res_block in self.res_blocks:
-            x = res_block(x)
-
-        x = self.upsample1(x)
-        x = nn.relu(x)
-        x = self.upsample2(x)
-        x = nn.relu(x)
-        x = self.upsample3(x)
-        x = nn.relu(x)
-        x = self.upsample4(x)
-        x = nn.relu(x)
-
-        x = self.conv_out(x)
-
-        return x
+    def __call__(self, x: Any) -> Any:
+        x = nn.relu(self.conv_in(x))
+        for block in self.res_blocks:
+            x = block(x)
+        for layer in self.upsample_layers:
+            x = nn.relu(layer(x))
+        return self.conv_out(x)
 
 
-def load_model_weights(decoder, params):
+def load_model_weights(decoder: Decoder, params: dict) -> Decoder:
     """Load the pretrained weights into the decoder model."""
     decoder.conv_in.weight = params["conv_in"]["weight"]
     decoder.conv_in.bias = params["conv_in"]["bias"]
 
     for i, res_block in enumerate(decoder.res_blocks):
         res_block_params = params["res_blocks"][i]
-
         res_block.conv1.weight = res_block_params["conv1"]["weight"]
         res_block.conv1.bias = res_block_params["conv1"]["bias"]
-
         res_block.conv2.weight = res_block_params["conv2"]["weight"]
         res_block.conv2.bias = res_block_params["conv2"]["bias"]
-
         res_block.conv3.weight = res_block_params["conv3"]["weight"]
         res_block.conv3.bias = res_block_params["conv3"]["bias"]
 
-    upsample_layers = [
-        decoder.upsample1,
-        decoder.upsample2,
-        decoder.upsample3,
-        decoder.upsample4,
-    ]
-
-    for i, upsample in enumerate(upsample_layers):
+    for i, upsample in enumerate(decoder.upsample_layers):
         upsample.weight = params["upsample_layers"][i]["weight"]
         upsample.bias = params["upsample_layers"][i]["bias"]
 
@@ -134,38 +125,35 @@ def load_model_weights(decoder, params):
     return decoder
 
 
-def _get_params(checkpoint):
+def _get_params(checkpoint: dict) -> dict:
     """Converts PyTorch checkpoint to MLX params."""
 
-    # For Conv2d: PyTorch uses (out_channels, in_channels, kernel_h, kernel_w)
-    # MLX expects (out_channels, kernel_h, kernel_w, in_channels)
-    def transp(kernel):
+    def transp(kernel: Any) -> Any:
         kernel = mx.array(kernel)
         return mx.transpose(kernel, (0, 2, 3, 1))
 
-    # For ConvTranspose2d, the input/output channels are swapped in PyTorch
-    def transp_transpose(kernel):
+    def transp_transpose(kernel: Any) -> Any:
         kernel = mx.array(kernel)
         kernel = mx.transpose(kernel, (1, 0, 2, 3))  # Swap in/out channels
         return mx.transpose(kernel, (0, 2, 3, 1))  # Convert to MLX format
 
-    def conv(name):
+    def conv(name: str) -> dict:
         return {
-            "bias": checkpoint[name + ".bias"],
-            "weight": transp(checkpoint[name + ".weight"]),
+            "bias": checkpoint[f"{name}.bias"],
+            "weight": transp(checkpoint[f"{name}.weight"]),
         }
 
-    def conv_transpose(name):
+    def conv_transpose(name: str) -> dict:
         return {
-            "bias": mx.array(checkpoint[name + ".bias"]),
-            "weight": mx.array(transp_transpose(checkpoint[name + ".weight"])),
+            "bias": mx.array(checkpoint[f"{name}.bias"]),
+            "weight": mx.array(transp_transpose(checkpoint[f"{name}.weight"])),
         }
 
-    def resblock(name):
+    def resblock(name: str) -> dict:
         return {
-            "conv1": conv(name + ".0"),
-            "conv2": conv(name + ".2"),
-            "conv3": conv(name + ".4"),
+            "conv1": conv(f"{name}.0"),
+            "conv2": conv(f"{name}.2"),
+            "conv3": conv(f"{name}.4"),
         }
 
     params = {
@@ -183,48 +171,52 @@ def _get_params(checkpoint):
         ],
         "conv_out": conv("decoder.12"),
     }
-
     return params
 
 
-def _quantized_values_from_codebook_indices(codebook_indices, embeddings):
+def _quantized_values_from_codebook_indices(
+    codebook_indices: mx.array, embeddings: mx.array
+) -> mx.array:
     batch_size, num_tokens = codebook_indices.shape
-    assert num_tokens == 16, codebook_indices.shape
-    unused_num_embeddings, embedding_dim = embeddings.shape
-
+    expected_tokens = 16
+    assert (
+        num_tokens == expected_tokens
+    ), f"Expected {expected_tokens} tokens, got {codebook_indices.shape}"
     encodings = mx.take(embeddings, codebook_indices.reshape((-1,)), axis=0)
-    encodings = encodings.reshape((batch_size, 4, 4, embedding_dim))
-    return encodings
+
+    return encodings.reshape((batch_size, 4, 4, embeddings.shape[1]))
 
 
 @functools.cache
-def get_reconstruct_masks(model):
-    """Reconstructs masks from codebook indices using MLX."""
+def get_reconstruct_masks(model: str) -> Callable[[mx.array], Any]:
+    """Loads the checkpoint and returns a function that reconstructs masks
+    from codebook indices using a preloaded MLX decoder.
+    """
+    checkpoint_path = _KNOWN_MODELS.get(model, model)
+    with gfile.GFile(checkpoint_path, "rb") as f:
+        checkpoint_data = dict(np.load(f))
+    params = _get_params(checkpoint_data)
 
-    def reconstruct_masks(codebook_indices):
+    decoder = Decoder()
+    decoder = load_model_weights(decoder, params)
+
+    def reconstruct_masks(codebook_indices: mx.array) -> Any:
         quantized = _quantized_values_from_codebook_indices(
             codebook_indices, params["_embeddings"]
         )
-
-        decoder = Decoder()
-        decoder = load_model_weights(decoder, params)
-
         return decoder(quantized)
-
-    with gfile.GFile(_KNOWN_MODELS.get(model, model), "rb") as f:
-        checkpoint_data = dict(np.load(f))
-        params = _get_params(checkpoint_data)
 
     return reconstruct_masks
 
 
-def extract_and_create_array(pattern: str):
+def extract_and_create_array(pattern: str) -> mx.array:
+    """Extracts segmentation tokens from the pattern and returns them as an MLX array."""
     seg_tokens = re.findall(r"<seg(\d{3})>", pattern)
-    seg_numbers = [int(match) for match in seg_tokens]
+    seg_numbers = [int(token) for token in seg_tokens]
     return mx.array(seg_numbers)
 
 
-if __name__ == "__main__":
+def main() -> None:
     model, processor = load(MODEL_PATH)
     config = model.config
 
@@ -234,17 +226,25 @@ if __name__ == "__main__":
     prompt = "segment android\n"
     formatted_prompt = apply_chat_template(processor, config, prompt, num_images=1)
     output = generate(model, processor, formatted_prompt, image, verbose=False)
-    log.info(output)
+    log.info(f"Output: {output}")
 
     reconstruct_fn = get_reconstruct_masks("oi")
 
-    parts = output.split(" ")
-    segs = list(filter(lambda x: "seg" in x, parts))
+    # Extract segmentation tokens using a list comprehension.
+    segs = [part for part in output.split(" ") if "seg" in part]
+    if not segs:
+        log.error("No segmentation tokens found in output.")
+        return
+
     codes = extract_and_create_array(segs[0])[None]
     log.info(f"Codes shape: {codes.shape}")
 
     masks = reconstruct_fn(codes)
-    mask = masks[0]
     log.info(f"Masks shape: {masks.shape}")
-    plt.imshow(mask)
+
+    plt.imshow(masks[0])
     plt.show()
+
+
+if __name__ == "__main__":
+    main()
