@@ -1,0 +1,6 @@
+tensorflow==2.18.0
+tensorflow-metal==1.2.0
+mlx==0.23.1
+mlx-lm==0.21.4
+mlx-vlm==0.1.14
+transformers==4.49.0
