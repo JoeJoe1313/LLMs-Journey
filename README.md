@@ -41,6 +41,7 @@ Models:
 - [Qwen2.5-VL](https://github.com/QwenLM/Qwen2.5-VL?tab=readme-ov-file) and [paper](https://arxiv.org/abs/2502.13923)
 - [Qwen2.5-Math](https://github.com/QwenLM/Qwen2.5-Math?tab=readme-ov-file) and [paper](https://arxiv.org/abs/2409.12122)
 - [PaliGemma 2: A Family of Versatile VLMs for Transfer](https://arxiv.org/abs/2412.03555v1)
+- [Magma: A Foundation Model for Multimodal AI Agents](https://arxiv.org/abs/2502.13130)
 
 Chain-of-Thought
 - [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
@@ -63,6 +64,7 @@ Apple:
 - [Machine Learning Research at Apple](https://machinelearning.apple.com)
 - [Distillation Scaling Laws](https://arxiv.org/abs/2502.08606)
 - [Parameters vs FLOPs: Scaling Laws for Optimal Sparsity for Mixture-of-Experts Language Models](https://arxiv.org/abs/2501.12370)
+- [Reversal Blessing: Thinking Backward May Outpace Thinking Forward in Multi-choice Questions](https://arxiv.org/abs/2502.18435v1)
 
 Misc:
 - [Scaling Pre-training to One Hundred Billion Data for Vision Language Models](https://arxiv.org/abs/2502.07617)
@@ -75,6 +77,10 @@ Misc:
 - [Leveraging the true depth of LLMs](https://arxiv.org/abs/2502.02790)
 - [NOLIMA: Long-Context Evaluation Beyond Literal Matching](https://arxiv.org/pdf/2502.05167)
 - [Memory Layers at Scale](https://arxiv.org/abs/2412.09764)
+- [Towards an AI co-scientist](https://arxiv.org/abs/2502.18864)
+- [On the consistent reasoning paradox of intelligence and optimal trust in AI: The power of 'I don't know'](https://arxiv.org/abs/2408.02357)
+- [LIMO: Less is More for Reasoning](https://arxiv.org/abs/2502.03387)
+- [SigLIP 2: Multilingual Vision-Language Encoders with Improved Semantic Understanding, Localization, and Dense Features](https://arxiv.org/abs/2502.14786)
 
 ## Resources
 
@@ -87,16 +93,12 @@ LangChain:
 - [Build a Retrieval Augmented Generation (RAG) App: Part 1](https://python.langchain.com/docs/tutorials/rag/)
 
 LangGraph:
-- l
 
 LangSmith:
-- l
 
 Ollama:
-- l
 
 LLamaIndex:
-- l
 
 Databases:
 - [Chroma](https://www.trychroma.com/home)
