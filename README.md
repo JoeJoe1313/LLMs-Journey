@@ -100,8 +100,10 @@ Ollama:
 
 LLamaIndex:
 
-Databases:
+Vector Databases:
 - [Chroma](https://www.trychroma.com/home)
+- [Pinecone](https://www.pinecone.io)
+- [Weaviate](https://weaviate.io)
 
 HuggingFace:
 - [MLX Community](https://huggingface.co/mlx-community)
