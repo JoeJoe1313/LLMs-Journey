@@ -64,7 +64,7 @@ Apple:
 - [Machine Learning Research at Apple](https://machinelearning.apple.com)
 - [Distillation Scaling Laws](https://arxiv.org/abs/2502.08606)
 - [Parameters vs FLOPs: Scaling Laws for Optimal Sparsity for Mixture-of-Experts Language Models](https://arxiv.org/abs/2501.12370)
-- [Reversal Blessing: Thinking Backward May Outpace Thinking Forward in Multi-choice Questions](https://arxiv.org/abs/2502.18435v1)
+- [Reversal Blessing: Thinking Backward May Outpace Thinking Forward in Multi-choice Questions](https://arxiv.org/abs/2502.18435v2)
 
 Misc:
 - [Scaling Pre-training to One Hundred Billion Data for Vision Language Models](https://arxiv.org/abs/2502.07617)
