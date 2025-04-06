@@ -92,14 +92,6 @@ MLX:
 LangChain:
 - [Build a Retrieval Augmented Generation (RAG) App: Part 1](https://python.langchain.com/docs/tutorials/rag/)
 
-LangGraph:
-
-LangSmith:
-
-Ollama:
-
-LLamaIndex:
-
 Vector Databases:
 - [Chroma](https://www.trychroma.com/home)
 - [Pinecone](https://www.pinecone.io)
@@ -121,3 +113,6 @@ GitHub Repos:
 - [Data_Science_Learning_Material](https://github.com/CornelliusYW/Data_Science_Learning_Material)
 - [RAG-To-Know](https://github.com/CornelliusYW/RAG-To-Know)
 - [Docling](https://github.com/DS4SD/docling?tab=readme-ov-file)
+
+Blogs/Posts:
+- [The Illustrated DeepSeek-R1](https://newsletter.languagemodels.co/p/the-illustrated-deepseek-r1)
