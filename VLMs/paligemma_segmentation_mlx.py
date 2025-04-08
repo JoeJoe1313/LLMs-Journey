@@ -1,12 +1,13 @@
-"""Part of the code below is adapted from 
+"""Part of the code below is adapted from
 https://github.com/google-research/big_vision/blob/main/big_vision/evaluators/proj/paligemma/transfers/segmentation.py.
 This version uses MLX instead of JAX/Flax.
 """
 
+import argparse
 import functools
 import logging
 import re
-from typing import Any, Callable, Tuple
+from typing import Callable, Tuple
 
 import matplotlib.pyplot as plt
 import mlx.core as mx
@@ -22,10 +23,7 @@ log.setLevel(logging.INFO)
 
 MODEL_PATH = "mlx-community/paligemma2-3b-mix-224-bf16"
 IMAGE_PATH = "./images/android.png"
-_KNOWN_MODELS = {
-    # Trained on open images.
-    "oi": "gs://big_vision/paligemma/vae-oid.npz",
-}
+_KNOWN_MODELS = {"oi": "gs://big_vision/paligemma/vae-oid.npz"}
 
 
 class ResBlock(nn.Module):
@@ -43,7 +41,7 @@ class ResBlock(nn.Module):
             in_channels=features, out_channels=features, kernel_size=1, padding=0
         )
 
-    def __call__(self, x: Any) -> Any:
+    def __call__(self, x: mx.array) -> mx.array:
         original_x = x
         x = nn.relu(self.conv1(x))
         x = nn.relu(self.conv2(x))
@@ -55,6 +53,7 @@ class Decoder(nn.Module):
     """
     Decoder that upscales quantized vectors to produce a mask.
     The architecture is parameterized to avoid hardcoded layer definitions.
+    Takes channels-last input data (B, H, W, C).
     """
 
     def __init__(
@@ -73,18 +72,18 @@ class Decoder(nn.Module):
             ResBlock(features=res_channels) for _ in range(num_res_blocks)
         ]
         self.upsample_layers = []
-        prev_channels = res_channels
+        out_up_ch = res_channels
         for ch in upsample_channels:
             self.upsample_layers.append(
                 nn.ConvTranspose2d(
-                    in_channels=prev_channels,
+                    in_channels=out_up_ch,
                     out_channels=ch,
                     kernel_size=4,
                     stride=2,
                     padding=1,
                 )
             )
-            prev_channels = ch
+            out_up_ch = ch
         self.conv_out = nn.Conv2d(
             in_channels=upsample_channels[-1],
             out_channels=out_channels,
@@ -92,61 +91,38 @@ class Decoder(nn.Module):
             padding=0,
         )
 
-    def __call__(self, x: Any) -> Any:
+    def __call__(self, x: mx.array) -> mx.array:
         x = nn.relu(self.conv_in(x))
         for block in self.res_blocks:
             x = block(x)
         for layer in self.upsample_layers:
             x = nn.relu(layer(x))
+
         return self.conv_out(x)
 
 
-def load_model_weights(decoder: Decoder, params: dict) -> Decoder:
-    """Load the pretrained weights into the decoder model."""
-    decoder.conv_in.weight = params["conv_in"]["weight"]
-    decoder.conv_in.bias = params["conv_in"]["bias"]
-
-    for i, res_block in enumerate(decoder.res_blocks):
-        res_block_params = params["res_blocks"][i]
-        res_block.conv1.weight = res_block_params["conv1"]["weight"]
-        res_block.conv1.bias = res_block_params["conv1"]["bias"]
-        res_block.conv2.weight = res_block_params["conv2"]["weight"]
-        res_block.conv2.bias = res_block_params["conv2"]["bias"]
-        res_block.conv3.weight = res_block_params["conv3"]["weight"]
-        res_block.conv3.bias = res_block_params["conv3"]["bias"]
-
-    for i, upsample in enumerate(decoder.upsample_layers):
-        upsample.weight = params["upsample_layers"][i]["weight"]
-        upsample.bias = params["upsample_layers"][i]["bias"]
-
-    decoder.conv_out.weight = params["conv_out"]["weight"]
-    decoder.conv_out.bias = params["conv_out"]["bias"]
-
-    return decoder
-
-
 def _get_params(checkpoint: dict) -> dict:
-    """Converts PyTorch checkpoint to MLX params."""
+    """Converts PyTorch checkpoint to MLX params (nested dict).
+    Uses transpositions yielding (Out, H, W, In) format weights."""
 
-    def transp(kernel: Any) -> Any:
-        kernel = mx.array(kernel)
-        return mx.transpose(kernel, (0, 2, 3, 1))
+    def transp(kernel: np.ndarray) -> mx.array:
+        return mx.transpose(mx.array(kernel), (0, 2, 3, 1))
 
-    def transp_transpose(kernel: Any) -> Any:
-        kernel = mx.array(kernel)
-        kernel = mx.transpose(kernel, (1, 0, 2, 3))  # Swap in/out channels
-        return mx.transpose(kernel, (0, 2, 3, 1))  # Convert to MLX format
+    def transp_transpose(kernel: np.ndarray) -> mx.array:
+        intermediate = mx.transpose(mx.array(kernel), (1, 0, 2, 3))
+
+        return mx.transpose(intermediate, (0, 2, 3, 1))
 
     def conv(name: str) -> dict:
         return {
-            "bias": checkpoint[f"{name}.bias"],
+            "bias": mx.array(checkpoint[f"{name}.bias"]),
             "weight": transp(checkpoint[f"{name}.weight"]),
         }
 
     def conv_transpose(name: str) -> dict:
         return {
             "bias": mx.array(checkpoint[f"{name}.bias"]),
-            "weight": mx.array(transp_transpose(checkpoint[f"{name}.weight"])),
+            "weight": transp_transpose(checkpoint[f"{name}.weight"]),
         }
 
     def resblock(name: str) -> dict:
@@ -171,6 +147,7 @@ def _get_params(checkpoint: dict) -> dict:
         ],
         "conv_out": conv("decoder.12"),
     }
+
     return params
 
 
@@ -179,30 +156,33 @@ def _quantized_values_from_codebook_indices(
 ) -> mx.array:
     batch_size, num_tokens = codebook_indices.shape
     expected_tokens = 16
-    assert (
-        num_tokens == expected_tokens
-    ), f"Expected {expected_tokens} tokens, got {codebook_indices.shape}"
+    if num_tokens != expected_tokens:
+        log.error(f"Expected {expected_tokens} tokens, got {codebook_indices.shape}")
+
     encodings = mx.take(embeddings, codebook_indices.reshape((-1,)), axis=0)
 
     return encodings.reshape((batch_size, 4, 4, embeddings.shape[1]))
 
 
 @functools.cache
-def get_reconstruct_masks(model: str) -> Callable[[mx.array], Any]:
+def get_reconstruct_masks(model: str) -> Callable[[mx.array], mx.array]:
     """Loads the checkpoint and returns a function that reconstructs masks
     from codebook indices using a preloaded MLX decoder.
     """
     checkpoint_path = _KNOWN_MODELS.get(model, model)
     with gfile.GFile(checkpoint_path, "rb") as f:
         checkpoint_data = dict(np.load(f))
+
     params = _get_params(checkpoint_data)
+    embeddings = params.pop("_embeddings")
+    log.info(f"VAE embedding dimension: {embeddings.shape[1]}")
 
     decoder = Decoder()
-    decoder = load_model_weights(decoder, params)
+    decoder.update(params)
 
-    def reconstruct_masks(codebook_indices: mx.array) -> Any:
+    def reconstruct_masks(codebook_indices: mx.array) -> mx.array:
         quantized = _quantized_values_from_codebook_indices(
-            codebook_indices, params["_embeddings"]
+            codebook_indices, embeddings
         )
         return decoder(quantized)
 
@@ -213,38 +193,63 @@ def extract_and_create_array(pattern: str) -> mx.array:
     """Extracts segmentation tokens from the pattern and returns them as an MLX array."""
     seg_tokens = re.findall(r"<seg(\d{3})>", pattern)
     seg_numbers = [int(token) for token in seg_tokens]
+
     return mx.array(seg_numbers)
 
 
-def main() -> None:
-    model, processor = load(MODEL_PATH)
+def main(args) -> None:
+    log.info(f"Loading PaliGemma model: {args.model_path}")
+    model, processor = load(args.model_path)
     config = model.config
 
-    image = load_image(IMAGE_PATH)
+    image = load_image(args.image_path)
     log.info(f"Image size: {image.size}")
 
-    prompt = "segment android\n"
+    vae_path = _KNOWN_MODELS.get(args.vae_checkpoint_path, args.vae_checkpoint_path)
+    reconstruct_fn = get_reconstruct_masks(vae_path)
+
+    prompt = args.prompt.strip() + "\n"
+    log.info(f"Using prompt: '{prompt.strip()}'")
     formatted_prompt = apply_chat_template(processor, config, prompt, num_images=1)
+
+    log.info("Generating segmentation output...")
     output = generate(model, processor, formatted_prompt, image, verbose=False)
-    log.info(f"Output: {output}")
+    log.info(f"Model output: {output}")
 
-    reconstruct_fn = get_reconstruct_masks("oi")
+    codes = extract_and_create_array(output)
+    log.info(f"Extracted codes: {codes.tolist()}")
+    codes_batch = codes[None, :]
+    log.info(f"Codes shape for VAE: {codes_batch.shape}")
 
-    # Extract segmentation tokens using a list comprehension.
-    segs = [part for part in output.split(" ") if "seg" in part]
-    if not segs:
-        log.error("No segmentation tokens found in output.")
-        return
+    log.info("Reconstructing mask from codes...")
+    masks = reconstruct_fn(codes_batch)
+    log.info(f"Reconstructed mask shape: {masks.shape}")
 
-    codes = extract_and_create_array(segs[0])[None]
-    log.info(f"Codes shape: {codes.shape}")
-
-    masks = reconstruct_fn(codes)
-    log.info(f"Masks shape: {masks.shape}")
-
-    plt.imshow(masks[0])
+    mask_np = np.array(masks[0, :, :, 0], copy=False)
+    plt.imshow(mask_np, cmap="viridis")
+    plt.title(f"Reconstructed Mask for '{args.prompt.strip()}'")
+    plt.axis("off")
     plt.show()
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Vision tasks using PaliGemma 2 mix.")
+    parser.add_argument(
+        "--image_path", type=str, default=IMAGE_PATH, help="Path to the input image."
+    )
+    parser.add_argument(
+        "--prompt",
+        type=str,
+        default="segment android",
+        required=False,
+        help="Prompt for the model.",
+    )
+    parser.add_argument(
+        "--model_path", type=str, default=MODEL_PATH, help="Path to the mlx model."
+    )
+    parser.add_argument(
+        "--vae_checkpoint_path", type=str, default="oi", help="Path to the .npz file."
+    )
+
+    cli_args = parser.parse_args()
+    main(cli_args)
