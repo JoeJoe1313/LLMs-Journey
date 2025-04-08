@@ -1,9 +1,12 @@
 """Part of the code below is taken from https://github.com/google-research/big_vision/blob/main/big_vision/evaluators/proj/paligemma/transfers/segmentation.py.
+
+pip install jax==0.4.26 jaxlib==0.4.26
+pip install jax-metal
+pip install flax
 """
 
 import functools
 import logging
-import os
 import re
 
 import flax.linen as nn
