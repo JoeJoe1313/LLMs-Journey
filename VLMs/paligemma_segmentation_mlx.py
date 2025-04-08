@@ -27,8 +27,6 @@ _KNOWN_MODELS = {"oi": "gs://big_vision/paligemma/vae-oid.npz"}
 
 
 class ResBlock(nn.Module):
-    """Residual block for MLX."""
-
     def __init__(self, features: int):
         super().__init__()
         self.conv1 = nn.Conv2d(
