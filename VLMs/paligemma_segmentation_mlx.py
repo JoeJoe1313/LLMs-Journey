@@ -7,8 +7,9 @@ import argparse
 import functools
 import logging
 import re
-from typing import Callable, Tuple
+from typing import Callable, List, Tuple
 
+import cv2
 import matplotlib.pyplot as plt
 import mlx.core as mx
 import mlx.nn as nn
@@ -21,8 +22,8 @@ logging.basicConfig()
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
-MODEL_PATH = "mlx-community/paligemma2-3b-mix-224-bf16"
-IMAGE_PATH = "./images/android.png"
+MODEL_PATH = "mlx-community/paligemma2-10b-mix-448-8bit"
+IMAGE_PATH = "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg"
 _KNOWN_MODELS = {"oi": "gs://big_vision/paligemma/vae-oid.npz"}
 
 
@@ -187,12 +188,114 @@ def get_reconstruct_masks(model: str) -> Callable[[mx.array], mx.array]:
     return reconstruct_masks
 
 
-def extract_and_create_array(pattern: str) -> mx.array:
-    """Extracts segmentation tokens from the pattern and returns them as an MLX array."""
-    seg_tokens = re.findall(r"<seg(\d{3})>", pattern)
-    seg_numbers = [int(token) for token in seg_tokens]
+def extract_and_create_arrays(pattern: str) -> List[mx.array]:
+    """Extracts segmentation tokens from each object in the pattern and returns a list of MLX arrays."""
+    object_strings = [obj.strip() for obj in pattern.split(";") if obj.strip()]
 
-    return mx.array(seg_numbers)
+    seg_tokens_arrays = []
+    for obj in object_strings:
+        seg_tokens = re.findall(r"<seg(\d{3})>", obj)
+        if seg_tokens:
+            seg_numbers = [int(token) for token in seg_tokens]
+            seg_tokens_arrays.append(mx.array(seg_numbers))
+
+    return seg_tokens_arrays
+
+
+def parse_bbox(model_output: str):
+    entries = model_output.split(";")
+
+    results = []
+    for entry in entries:
+        entry = entry.strip()
+        numbers = re.findall(r"<loc(\d+)>", entry)
+        if len(numbers) == 4:
+            bbox = [int(num) for num in numbers]
+            results.append(bbox)
+
+    return results
+
+
+def gather_masks(output, codes_list, reconstruct_fn):
+    masks_list = []
+
+    target_width, target_height = 448, 448
+    for i, codes in enumerate(codes_list):
+        codes_batch = codes[None, :]
+        masks = reconstruct_fn(codes_batch)
+        mask_np = np.array(masks[0, :, :, 0], copy=False)
+
+        y_min, x_min, y_max, x_max = parse_bbox(output)[i]
+        x_min_norm = int(x_min / 1024 * target_width)
+        y_min_norm = int(y_min / 1024 * target_height)
+        x_max_norm = int(x_max / 1024 * target_width)
+        y_max_norm = int(y_max / 1024 * target_height)
+
+        masks_list.append(
+            {
+                "mask": mask_np,
+                "coordinates": (x_min_norm, y_min_norm, x_max_norm, y_max_norm),
+            }
+        )
+
+    return masks_list
+
+
+def plot_masks(processor, masks_list):
+
+    image = load_image(IMAGE_PATH)
+    img_array = processor.image_processor(image)["pixel_values"][0].transpose(1, 2, 0)
+    img_array = (img_array * 0.5 + 0.5).clip(0, 1)
+
+    num_masks = len(masks_list)
+    num_subplots = num_masks + 1
+
+    _, axs = plt.subplots(1, num_subplots, figsize=(5 * num_subplots, 6))
+
+    if num_subplots == 1:
+        axs = [axs]
+
+    composite_mask = np.ones((img_array.shape[0], img_array.shape[1], 1)) * (-1)
+    for mask_info in masks_list:
+        mask_np = mask_info["mask"]
+        x_min, y_min, x_max, y_max = mask_info["coordinates"]
+
+        width = x_max - x_min
+        height = y_max - y_min
+
+        resized_mask = cv2.resize(
+            mask_np, (width, height), interpolation=cv2.INTER_NEAREST
+        )
+        resized_mask = resized_mask.reshape((height, width, 1))
+
+        composite_mask[y_min:y_max, x_min:x_max] = resized_mask
+
+    axs[0].imshow(img_array)
+    axs[0].imshow(composite_mask, alpha=0.5)
+    axs[0].set_title("Composite Mask Overlay")
+    axs[0].axis("off")
+
+    for i, mask_info in enumerate(masks_list):
+        individual_mask = np.ones((img_array.shape[0], img_array.shape[1], 1)) * (-1)
+        mask_np = mask_info["mask"]
+        x_min, y_min, x_max, y_max = mask_info["coordinates"]
+        width = x_max - x_min
+        height = y_max - y_min
+
+        resized_mask = cv2.resize(
+            mask_np, (width, height), interpolation=cv2.INTER_NEAREST
+        )
+        resized_mask = resized_mask.reshape((height, width, 1))
+
+        individual_mask[y_min:y_max, x_min:x_max] = resized_mask
+
+        axs[i + 1].imshow(img_array)
+        axs[i + 1].imshow(individual_mask, alpha=0.5)
+        axs[i + 1].set_title(f"Mask {i + 1}")
+        axs[i + 1].axis("off")
+
+    plt.tight_layout()
+    plt.show()
 
 
 def main(args) -> None:
@@ -214,20 +317,14 @@ def main(args) -> None:
     output = generate(model, processor, formatted_prompt, image, verbose=False)
     log.info(f"Model output: {output}")
 
-    codes = extract_and_create_array(output)
-    log.info(f"Extracted codes: {codes.tolist()}")
-    codes_batch = codes[None, :]
-    log.info(f"Codes shape for VAE: {codes_batch.shape}")
+    codes_list = extract_and_create_arrays(output)
+    log.info(f"Extracted codes: {codes_list}")
 
     log.info("Reconstructing mask from codes...")
-    masks = reconstruct_fn(codes_batch)
-    log.info(f"Reconstructed mask shape: {masks.shape}")
+    masks_list = gather_masks(output, codes_list, reconstruct_fn)
 
-    mask_np = np.array(masks[0, :, :, 0], copy=False)
-    plt.imshow(mask_np, cmap="viridis")
-    plt.title(f"Reconstructed Mask for '{args.prompt.strip()}'")
-    plt.axis("off")
-    plt.show()
+    log.info("Plotting masks...")
+    plot_masks(processor, masks_list)
 
 
 if __name__ == "__main__":
@@ -236,11 +333,7 @@ if __name__ == "__main__":
         "--image_path", type=str, default=IMAGE_PATH, help="Path to the input image."
     )
     parser.add_argument(
-        "--prompt",
-        type=str,
-        default="segment android",
-        required=False,
-        help="Prompt for the model.",
+        "--prompt", type=str, required=True, help="Prompt for the model."
     )
     parser.add_argument(
         "--model_path", type=str, default=MODEL_PATH, help="Path to the mlx model."
