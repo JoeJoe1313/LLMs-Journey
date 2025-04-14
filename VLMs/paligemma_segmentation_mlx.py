@@ -241,58 +241,40 @@ def gather_masks(output, codes_list, reconstruct_fn):
     return masks_list
 
 
-def plot_masks(processor, masks_list):
+def plot_masks(args, processor, masks_list):
 
-    image = load_image(IMAGE_PATH)
+    image = load_image(args.image_path)
     img_array = processor.image_processor(image)["pixel_values"][0].transpose(1, 2, 0)
     img_array = (img_array * 0.5 + 0.5).clip(0, 1)
 
-    num_masks = len(masks_list)
-    num_subplots = num_masks + 1
-
-    _, axs = plt.subplots(1, num_subplots, figsize=(5 * num_subplots, 6))
-
-    if num_subplots == 1:
-        axs = [axs]
-
-    composite_mask = np.ones((img_array.shape[0], img_array.shape[1], 1)) * (-1)
+    full = np.ones((448, 448, 1)) * (-1)
     for mask_info in masks_list:
         mask_np = mask_info["mask"]
-        x_min, y_min, x_max, y_max = mask_info["coordinates"]
+        x_min_norm, y_min_norm, x_max_norm, y_max_norm = mask_info["coordinates"]
 
-        width = x_max - x_min
-        height = y_max - y_min
+        width = x_max_norm - x_min_norm
+        height = y_max_norm - y_min_norm
 
         resized_mask = cv2.resize(
             mask_np, (width, height), interpolation=cv2.INTER_NEAREST
         )
         resized_mask = resized_mask.reshape((height, width, 1))
 
-        composite_mask[y_min:y_max, x_min:x_max] = resized_mask
+        full[y_min_norm:y_max_norm, x_min_norm:x_max_norm] = resized_mask
+
+    n_masks = len(masks_list)
+    _, axs = plt.subplots(1, n_masks + 1, figsize=(5 * (n_masks + 1), 6))
 
     axs[0].imshow(img_array)
-    axs[0].imshow(composite_mask, alpha=0.5)
-    axs[0].set_title("Composite Mask Overlay")
-    axs[0].axis("off")
+    axs[0].imshow(full, alpha=0.5)
+    axs[0].set_title("Mask Overlay")
+    axs[0].axis("on")
 
-    for i, mask_info in enumerate(masks_list):
-        individual_mask = np.ones((img_array.shape[0], img_array.shape[1], 1)) * (-1)
+    for i, mask_info in enumerate(masks_list, start=1):
         mask_np = mask_info["mask"]
-        x_min, y_min, x_max, y_max = mask_info["coordinates"]
-        width = x_max - x_min
-        height = y_max - y_min
-
-        resized_mask = cv2.resize(
-            mask_np, (width, height), interpolation=cv2.INTER_NEAREST
-        )
-        resized_mask = resized_mask.reshape((height, width, 1))
-
-        individual_mask[y_min:y_max, x_min:x_max] = resized_mask
-
-        axs[i + 1].imshow(img_array)
-        axs[i + 1].imshow(individual_mask, alpha=0.5)
-        axs[i + 1].set_title(f"Mask {i + 1}")
-        axs[i + 1].axis("off")
+        axs[i].imshow(mask_np)
+        axs[i].set_title(f"Reconstructed Mask {i}")
+        axs[i].axis("on")
 
     plt.tight_layout()
     plt.show()
@@ -324,7 +306,7 @@ def main(args) -> None:
     masks_list = gather_masks(output, codes_list, reconstruct_fn)
 
     log.info("Plotting masks...")
-    plot_masks(processor, masks_list)
+    plot_masks(args, processor, masks_list)
 
 
 if __name__ == "__main__":
