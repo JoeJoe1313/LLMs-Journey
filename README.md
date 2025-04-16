@@ -1,5 +1,78 @@
 # LLMs-Journey
 
+The **LLMs-Journey** repository covers topics including:
+
+- **Large Language Models (LLMs)**
+- **Agentic Systems and Workflows**
+- **Fine-Tuning (e.g., LoRA, QLoRa)**
+- **Retrieval-Augmented Generation (RAG)**
+- **Vision-Language Models (VLMs)**
+- **Complementary Resources and Research**
+
+The projects are organized into topic-specific directories.
+
+## Repository Structure
+
+```
+LLMs-Journey/
+├── .gitignore
+├── README.md
+├── requirements.txt
+├── simple_fine_tune_lora_mlx.ipynb
+├── Agents/
+│   ├── fine_tune_func_calling.ipynb
+│   ├── hf_unit2.ipynb
+│   ├── llamaindex_agentic_workflows.ipynb
+│   ├── llamaindex_agents.ipynb
+│   ├── llamaindex_hf_course.ipynb
+│   ├── llamaindex_tools.ipynb
+│   └── llamaindex_with_mlx.ipynb
+├── LLMs/
+│   ├── gemma_3.ipynb
+│   ├── hf_to_mlx_lm_model.ipynb
+│   ├── mlx_lm_simple_generate.ipynb
+│   ├── qwen2_5_math.ipynb
+│   └── reason.py
+├── RAG/
+│   └── *(TBD)*
+├── VLMs/
+│   └── *(TBD)*
+└── images/
+    └── *(Supporting images)*
+```
+
+## Detailed File and Directory Descriptions
+
+### Root Directory Files (temp)
+
+- **simple_fine_tune_lora_mlx.ipynb**  
+   - A Jupyter Notebook that demonstrates a straightforward fine-tuning example using the LoRA (Low-Rank Adaptation) method within an MLX setup.
+   - Blog post: [Fine-Tuning LLMs with LoRA and MLX-LM](https://medium.com/@levchevajoana/fine-tuning-llms-with-lora-and-mlx-lm-c0b143642deb)
+
+
+### Agents Folder
+
+- Blog post: [Fine-Tuning LLMs for Function-Calling with MLX-LM](https://medium.com/@levchevajoana/fine-tuning-a-model-for-function-calling-with-mlx-lm-d00d587e2559)
+
+### LLMs Folder
+
+TBD
+
+### RAG Folder
+
+TBD
+
+### VLMs Folder
+
+- Blog post: [Qwen2.5-VL with MLX-VLM](https://medium.com/@levchevajoana/qwen2-5-vl-with-mlx-vlm-c4329b40ab87)
+- Blog post: [Image Segmentation with PaliGemma 2 Mix and MLX](https://medium.com/@levchevajoana/image-segmentation-with-paligemma-2-mix-and-mlx-7e69e077968b)
+
+### images Folder
+
+- **images/**  
+  Contains visual resources used throughout the repository.
+
+
 ## What to read?
 
 Books:
@@ -12,6 +85,10 @@ Agents:
 - [ai-agents-for-beginners (Microsoft)](https://github.com/microsoft/ai-agents-for-beginners)
 - [Agents (Google's whitepaper)](https://www.kaggle.com/whitepaper-agents)
 - [Agency Is Frame-Dependent](https://arxiv.org/abs/2502.04403)
+
+Promptning:
+- [Prompt Engineering (Google's whitepaper)](https://www.kaggle.com/whitepaper-prompt-engineering)
+- [GPT-4.1 Prompting Guide](https://cookbook.openai.com/examples/gpt4-1_prompting_guide)
 
 Fine-Tuning:
 - [🤗 PEFT: Parameter-Efficient Fine-Tuning of Billion-Scale Models on Low-Resource Hardware](https://huggingface.co/blog/peft)
@@ -42,6 +119,9 @@ Models:
 - [Qwen2.5-Math](https://github.com/QwenLM/Qwen2.5-Math?tab=readme-ov-file) and [paper](https://arxiv.org/abs/2409.12122)
 - [PaliGemma 2: A Family of Versatile VLMs for Transfer](https://arxiv.org/abs/2412.03555v1)
 - [Magma: A Foundation Model for Multimodal AI Agents](https://arxiv.org/abs/2502.13130)
+- [Florence-2: Advancing a Unified Representation for a Variety of Vision Tasks](https://arxiv.org/abs/2311.06242)
+- [Kimi-VL Technical Report](https://arxiv.org/abs/2504.07491)
+- [InternVL3: Exploring Advanced Training and Test-Time Recipes for Open-Source Multimodal Models](https://arxiv.org/abs/2504.10479)
 
 Chain-of-Thought
 - [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
@@ -81,6 +161,8 @@ Misc:
 - [On the consistent reasoning paradox of intelligence and optimal trust in AI: The power of 'I don't know'](https://arxiv.org/abs/2408.02357)
 - [LIMO: Less is More for Reasoning](https://arxiv.org/abs/2502.03387)
 - [SigLIP 2: Multilingual Vision-Language Encoders with Improved Semantic Understanding, Localization, and Dense Features](https://arxiv.org/abs/2502.14786)
+- [How new data permeates LLM knowledge and how to dilute it](https://arxiv.org/abs/2504.09522)
+- [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 
 ## Resources
 
@@ -116,3 +198,5 @@ GitHub Repos:
 
 Blogs/Posts:
 - [The Illustrated DeepSeek-R1](https://newsletter.languagemodels.co/p/the-illustrated-deepseek-r1)
+- [Transformers from Scratch](https://www.brandonrohrer.com/transformers)
+- [Chain of Thought](https://www.k-a.in/cot.html)
