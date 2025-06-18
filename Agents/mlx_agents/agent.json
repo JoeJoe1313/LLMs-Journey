@@ -1,0 +1,17 @@
+{
+    "model": "mlx-community/qwen3-4b-bf16",
+    "endpointUrl": "http://localhost:8080/v1",
+    "servers": [
+        {
+            "type": "stdio",
+            "config": {
+                "command": "npx",
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-filesystem",
+                    "."
+                ]
+            }
+        }
+    ]
+}
