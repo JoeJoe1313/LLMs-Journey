@@ -9,70 +9,30 @@ The **LLMs-Journey** repository covers topics including:
 - **Vision-Language Models (VLMs)**
 - **Complementary Resources and Research**
 
-The projects are organized into topic-specific directories.
+## Blog Posts
 
-## Repository Structure
+### Fine-Tuning
 
-```
-LLMs-Journey/
-├── .gitignore
-├── README.md
-├── requirements.txt
-├── simple_fine_tune_lora_mlx.ipynb
-├── Agents/
-│   ├── fine_tune_func_calling.ipynb
-│   ├── hf_unit2.ipynb
-│   ├── llamaindex_agentic_workflows.ipynb
-│   ├── llamaindex_agents.ipynb
-│   ├── llamaindex_hf_course.ipynb
-│   ├── llamaindex_tools.ipynb
-│   └── llamaindex_with_mlx.ipynb
-├── LLMs/
-│   ├── gemma_3.ipynb
-│   ├── hf_to_mlx_lm_model.ipynb
-│   ├── mlx_lm_simple_generate.ipynb
-│   ├── qwen2_5_math.ipynb
-│   └── reason.py
-├── RAG/
-│   └── *(TBD)*
-├── VLMs/
-│   └── *(TBD)*
-└── images/
-    └── *(Supporting images)*
-```
-
-## Detailed File and Directory Descriptions
-
-### Root Directory Files (temp)
-
-- **simple_fine_tune_lora_mlx.ipynb**  
-   - A Jupyter Notebook that demonstrates a straightforward fine-tuning example using the LoRA (Low-Rank Adaptation) method within an MLX setup.
-   - Blog post: [Fine-Tuning LLMs with LoRA and MLX-LM](https://medium.com/@levchevajoana/fine-tuning-llms-with-lora-and-mlx-lm-c0b143642deb)
+- [Fine-Tuning LLMs with LoRA and MLX-LM](https://medium.com/@levchevajoana/fine-tuning-llms-with-lora-and-mlx-lm-c0b143642deb)
 
 
-### Agents Folder
+### Agents
 
-- Blog post: [Fine-Tuning LLMs for Function-Calling with MLX-LM](https://medium.com/@levchevajoana/fine-tuning-a-model-for-function-calling-with-mlx-lm-d00d587e2559)
+- [Fine-Tuning LLMs for Function-Calling with MLX-LM](https://medium.com/@levchevajoana/fine-tuning-a-model-for-function-calling-with-mlx-lm-d00d587e2559)
 
-### LLMs Folder
+### VLMs
 
-TBD
+- [Qwen2.5-VL with MLX-VLM](https://medium.com/@levchevajoana/qwen2-5-vl-with-mlx-vlm-c4329b40ab87)
+- [Image Segmentation with PaliGemma 2 Mix and MLX](https://medium.com/@levchevajoana/image-segmentation-with-paligemma-2-mix-and-mlx-7e69e077968b)
+- [Image Segmentation with PaliGemma 2 mix, Transformers, Docker, FastAPI, and GitHub Actions](https://medium.com/@levchevajoana/image-segmentation-with-paligemma-2-mix-transformers-docker-fastapi-and-github-actions-ff6d00253832)
 
-### RAG Folder
+### On-Device AI
 
-TBD
+- [Chat with Qwen3 on your iPhone: A Step-by-Step Guide](https://medium.com/@levchevajoana/chat-with-qwen3-on-your-iphone-a-step-by-step-guide-515bb957cd02)
 
-### VLMs Folder
+### Misc
 
-- Blog post: [Qwen2.5-VL with MLX-VLM](https://medium.com/@levchevajoana/qwen2-5-vl-with-mlx-vlm-c4329b40ab87)
-- Blog post: [Image Segmentation with PaliGemma 2 Mix and MLX](https://medium.com/@levchevajoana/image-segmentation-with-paligemma-2-mix-and-mlx-7e69e077968b)
-- Blog post: [Image Segmentation with PaliGemma 2 mix, Transformers, Docker, FastAPI, and GitHub Actions](https://medium.com/@levchevajoana/image-segmentation-with-paligemma-2-mix-transformers-docker-fastapi-and-github-actions-ff6d00253832)
-
-### images Folder
-
-- **images/**  
-  Contains visual resources used throughout the repository.
-
+- [Thinking Backwards: The “Reversal Blessing” in LLM Multiple-Choice Reasoning](https://medium.com/@levchevajoana/thinking-backwards-the-reversal-blessing-in-llm-multiple-choice-reasoning-fa71916b51e5)
 
 ## What to read?
 
