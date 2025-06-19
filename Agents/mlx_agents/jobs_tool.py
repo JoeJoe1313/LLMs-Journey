@@ -6,7 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 from openai import OpenAI
 
-MODEL = "mlx-community/qwen3-4b-bf16"
+MODEL = "mlx-community/Qwen3-4B-bf16"
 TOOLS = [
     {
         "type": "function",
@@ -31,6 +31,72 @@ TOOLS = [
         },
     }
 ]
+
+
+def parse_bg_date(date_text: str) -> datetime:
+    """Parse Bulgarian date format like '18 юни' to datetime object"""
+    bg_months = {
+        # "януари": "01",
+        # "февруари": "02",
+        # "март": "03",
+        # "април": "04",
+        "май": "05",
+        "юни": "06",
+        "юли": "07",
+        # "август": "08",
+        # "септември": "09",
+        # "октомври": "10",
+        # "ноември": "11",
+        # "декември": "12",
+    }
+
+    date_parts = date_text.strip().split()
+    if len(date_parts) != 2:
+        raise ValueError(f"Invalid date format: {date_text}")
+
+    day, month = date_parts
+
+    current_year = datetime.now().year
+
+    month_num = bg_months.get(month.lower())
+    if not month_num:
+        raise ValueError(f"Invalid month: {month}")
+
+    date_str = f"{current_year}-{month_num}-{day.zfill(2)}"
+
+    return datetime.strptime(date_str, "%Y-%m-%d")
+
+
+def filter_jobs_by_date(jobs: list, target_date: str = None) -> list:
+    """
+    Filter jobs by target date
+    Args:
+        jobs: List of job dictionaries
+        target_date: Target date string in 'YYYY-MM-DD' format
+    """
+    if not target_date:
+        target_date = datetime.now().strftime("%Y-%m-%d")
+
+    target_dt = datetime.strptime(target_date, "%Y-%m-%d")
+    filtered_jobs = []
+
+    for job in jobs:
+        try:
+            # Get the date text from job
+            date_elem = job.find("span", class_="date")
+            if not date_elem:
+                continue
+
+            job_date = parse_bg_date(date_elem.get_text(strip=True))
+
+            # Compare dates (ignore time)
+            if job_date.date() == target_dt.date():
+                filtered_jobs.append(job)
+        except (ValueError, AttributeError) as e:
+            print(f"Error parsing date: {e}")
+            continue
+
+    return filtered_jobs
 
 
 def parse_date(date_str):
@@ -58,16 +124,11 @@ def get_category_mapping():
 def scrape_dev_bg_jobs(category, target_date):
     """Scrape jobs from dev.bg for a specific category and date"""
     try:
-        # Map category to dev.bg format
         category_mapping = get_category_mapping()
         category_param = category_mapping.get(
             category.lower(), category.lower().replace(" ", "-")
         )
 
-        # Build URL
-        base_url = f"https://dev.bg/company/jobs/{category_param}"
-
-        # Set up headers to mimic a real browser
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -76,80 +137,78 @@ def scrape_dev_bg_jobs(category, target_date):
             "Connection": "keep-alive",
         }
 
-        # Make request
-        response = requests.get(base_url, headers=headers, timeout=10)
-        print(
-            f"Fetching jobs for category: {category_param} on {target_date.strftime('%Y-%m-%d')}."
-        )
-        response.raise_for_status()
-
-        soup = BeautifulSoup(response.content, "html.parser")
-
-        # Find job listings - you'll need to inspect dev.bg to get the correct selectors
         job_listings = []
+        for page in range(1, 15):
 
-        # Common selectors for job sites (adjust based on dev.bg's actual structure)
-        job_containers = soup.find_all(
-            ["div", "article"], class_=re.compile(r"job|listing|card", re.I)
-        )
+            base_url = f"https://dev.bg/company/jobs/{category_param}?_paged={page}"
 
-        if not job_containers:
-            # Try alternative selectors
-            job_containers = soup.find_all("a", href=re.compile(r"/job/"))
+            response = requests.get(base_url, headers=headers, timeout=10)
+            print(
+                f"Fetching jobs for category on page {page}: {category_param} on {target_date.strftime('%Y-%m-%d')}."
+            )
+            response.raise_for_status()
 
-        target_date_str = target_date.strftime("%Y-%m-%d")
+            soup = BeautifulSoup(response.content, "html.parser")
 
-        for job in job_containers[:20]:  # Limit to first 20 jobs
-            try:
-                # Extract job information
-                title_elem = job.find(
-                    ["h1", "h2", "h3", "h4"], class_=re.compile(r"title|name|job", re.I)
-                )
-                if not title_elem:
-                    title_elem = job.find("a")
+            job_containers = soup.find_all(
+                "div", class_=lambda x: x and x.startswith("job-list-item")
+            )
 
-                title = (
-                    title_elem.get_text(strip=True) if title_elem else "Title not found"
-                )
+            target_date_str = target_date.strftime("%Y-%m-%d")
 
-                # Extract company
-                company_elem = job.find(
-                    ["span", "div", "p"], class_=re.compile(r"company|employer", re.I)
-                )
-                company = (
-                    company_elem.get_text(strip=True)
-                    if company_elem
-                    else "Company not specified"
-                )
+            for job in job_containers:
+                try:
+                    # Extract job information
+                    title_elem = job.find(
+                        "h6",
+                        class_=lambda x: x and "job-title" in x,
+                    )
+                    title = (
+                        title_elem.get_text(strip=True)
+                        if title_elem
+                        else "Title not found"
+                    )
 
-                # Extract date
-                date_elem = job.find(
-                    ["span", "div", "time"],
-                    class_=re.compile(r"date|time|posted", re.I),
-                )
-                date_posted = (
-                    date_elem.get_text(strip=True) if date_elem else "Date not found"
-                )
+                    # Extract company
+                    company_elem = job.find(
+                        ["span", "div", "p"],
+                        class_=re.compile(r"company|employer", re.I),
+                    )
+                    company = (
+                        company_elem.get_text(strip=True)
+                        if company_elem
+                        else "Company not specified"
+                    )
 
-                # Extract link
-                link_elem = job.find("a")
-                link = link_elem.get("href") if link_elem else ""
-                if link and not link.startswith("http"):
-                    link = f"https://dev.bg{link}"
+                    # Extract date
+                    date_elem = job.find("span", class_="date")
+                    date_posted = (
+                        date_elem.get_text(strip=True)
+                        if date_elem
+                        else "Date not found"
+                    )
+                    parsed_date = parse_bg_date(date_posted)
+                    formatted_date = parsed_date.strftime("%Y-%m-%d")
 
-                job_info = {
-                    "title": title,
-                    "company": company,
-                    "date_posted": date_posted,
-                    "link": link,
-                    "category": category,
-                }
+                    # Extract link
+                    link_elem = job.find("a")
+                    link = link_elem.get("href") if link_elem else ""
+                    if link and not link.startswith("http"):
+                        link = f"https://dev.bg{link}"
 
-                job_listings.append(job_info)
+                    job_info = {
+                        "title": title,
+                        "company": company,
+                        "date_posted": date_posted,
+                        "link": link,
+                        "category": category,
+                    }
+                    if target_date_str == formatted_date:
+                        job_listings.append(job_info)
 
-            except Exception as e:
-                print(f"Error parsing job: {e}")
-                continue
+                except Exception as e:
+                    print(f"Error parsing job: {e}")
+                    continue
 
         return job_listings
 
@@ -189,11 +248,15 @@ def get_todays_jobs(category, date="today"):
 
 
 if __name__ == "__main__":
-    client = OpenAI(base_url="http://localhost:8080/v1", api_key="not-needed")
+
+    client = OpenAI(
+        base_url="http://localhost:8080/v1",
+        api_key="not-needed",
+    )
     messages = [
         {
             "role": "user",
-            "content": "What are the jobs from today in Data Science category?",
+            "content": "What are the jobs only from today in Data Science category? Structure the ootput as title:, company:, date_posted:, and link: for each job.",
         }
     ]
 
@@ -208,17 +271,13 @@ if __name__ == "__main__":
     )
     print("First response:", response.choices[0].message)
 
-    # Check if tool calls were made
     if response.choices[0].message.tool_calls:
-        # Call the function
+
         function = response.choices[0].message.tool_calls[0].function
-        function_args = json.loads(function.arguments)  # Parse JSON string to dict
+        function_args = json.loads(function.arguments)
         tool_result = functions[function.name](**function_args)
 
-        # Add the tool call to messages
         messages.append(response.choices[0].message)
-
-        # Add the tool result to messages
         messages.append(
             {
                 "role": "tool",
@@ -228,7 +287,6 @@ if __name__ == "__main__":
             }
         )
 
-        # Generate the final response
         final_response = client.chat.completions.create(
             model=MODEL,
             messages=messages,
