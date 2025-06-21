@@ -1,10 +1,15 @@
 import json
+import logging
 import re
 from datetime import datetime, timedelta
 
 import requests
 from bs4 import BeautifulSoup
 from openai import OpenAI
+
+logging.basicConfig()
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
 
 MODEL = "mlx-community/Qwen3-4B-bf16"
 TOOLS = [
@@ -82,18 +87,16 @@ def filter_jobs_by_date(jobs: list, target_date: str = None) -> list:
 
     for job in jobs:
         try:
-            # Get the date text from job
             date_elem = job.find("span", class_="date")
             if not date_elem:
                 continue
 
             job_date = parse_bg_date(date_elem.get_text(strip=True))
 
-            # Compare dates (ignore time)
             if job_date.date() == target_dt.date():
                 filtered_jobs.append(job)
         except (ValueError, AttributeError) as e:
-            print(f"Error parsing date: {e}")
+            log.error(f"Error parsing date: {e}")
             continue
 
     return filtered_jobs
@@ -143,7 +146,7 @@ def scrape_dev_bg_jobs(category, target_date):
             base_url = f"https://dev.bg/company/jobs/{category_param}?_paged={page}"
 
             response = requests.get(base_url, headers=headers, timeout=10)
-            print(
+            log.info(
                 f"Fetching jobs for category on page {page}: {category_param} on {target_date.strftime('%Y-%m-%d')}."
             )
             response.raise_for_status()
@@ -207,7 +210,7 @@ def scrape_dev_bg_jobs(category, target_date):
                         job_listings.append(job_info)
 
                 except Exception as e:
-                    print(f"Error parsing job: {e}")
+                    log.error(f"Error parsing job: {e}")
                     continue
 
         return job_listings
@@ -269,7 +272,7 @@ if __name__ == "__main__":
         tools=TOOLS,
         max_tokens=8192,
     )
-    print("First response:", response.choices[0].message)
+    log.info("First response:", response.choices[0].message)
 
     if response.choices[0].message.tool_calls:
 
@@ -293,6 +296,6 @@ if __name__ == "__main__":
             tools=TOOLS,
             max_tokens=8192,
         )
-        print("\nFinal response:", final_response.choices[0].message.content)
+        log.info("\nFinal response:", final_response.choices[0].message.content)
     else:
-        print("No tool calls were made")
+        log.info("No tool calls were made")

@@ -1,10 +1,15 @@
 import json
+import logging
 import re
 from datetime import datetime, timedelta
 
 import requests
 from bs4 import BeautifulSoup
 from openai import OpenAI
+
+logging.basicConfig()
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
 
 MODEL = "mlx-community/Qwen3-8B-8bit"
 TOOLS = [
@@ -93,7 +98,7 @@ def filter_jobs_by_date(jobs: list, target_date: str = None) -> list:
             if job_date.date() == target_dt.date():
                 filtered_jobs.append(job)
         except (ValueError, AttributeError) as e:
-            print(f"Error parsing date: {e}")
+            log.error(f"Error parsing date: {e}")
             continue
 
     return filtered_jobs
@@ -116,6 +121,8 @@ def get_category_mapping():
     """Map common category names to dev.bg category parameters"""
     return {
         "data science": "data-science",
+        "machine learning": "data-science",
+        "data": "data-science",
         "backend development": "back-end-development",
         "python development": "python",
     }
@@ -143,7 +150,7 @@ def scrape_dev_bg_jobs(category, target_date):
             base_url = f"https://dev.bg/company/jobs/{category_param}?_paged={page}"
 
             response = requests.get(base_url, headers=headers, timeout=10)
-            # print(
+            # log.info(
             #     f"Fetching jobs for category on page {page}: {category_param} on {target_date.strftime('%Y-%m-%d')}."
             # )
             response.raise_for_status()
@@ -207,7 +214,7 @@ def scrape_dev_bg_jobs(category, target_date):
                         job_listings.append(job_info)
 
                 except Exception as e:
-                    print(f"Error parsing job: {e}")
+                    log.error(f"Error parsing job: {e}")
                     continue
 
         return job_listings
@@ -264,14 +271,14 @@ if __name__ == "__main__":
     available_functions = {
         "get_todays_jobs": get_todays_jobs,
     }
-    print(
+    log.info(
         "Job Search Assistant activated. Type 'quit' or 'exit' to end the conversation."
     )
 
     while True:
         user_input = input("You: ")
         if user_input.lower() in ["quit", "exit"]:
-            print("Assistant: Goodbye!")
+            log.info("Assistant: Goodbye!")
             break
 
         messages.append({"role": "user", "content": user_input})
@@ -293,7 +300,9 @@ if __name__ == "__main__":
                 function_to_call = available_functions[function_name]
                 function_args = json.loads(tool_call.function.arguments)
 
-                print(f"Assistant: Thinking... (Calling tool: {function_name})")
+                log.info(
+                    f"Assistant: Thinking... (Calling tool: {function_name} with args: {function_args} )"
+                )
 
                 function_response = function_to_call(**function_args)
 
@@ -309,11 +318,12 @@ if __name__ == "__main__":
             response = client.chat.completions.create(
                 model=MODEL,
                 messages=messages,
+                tools=TOOLS,
+                tool_choice="auto",
                 max_tokens=8192,
             )
             response_message = response.choices[0].message
 
         final_content = response_message.content
-        print(f"Assistant: {final_content}")
-
+        log.info(f"Assistant: {final_content}")
         messages.append({"role": "assistant", "content": final_content})
