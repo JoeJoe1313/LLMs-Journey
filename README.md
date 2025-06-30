@@ -19,6 +19,7 @@ The **LLMs-Journey** repository covers topics including:
 ### Agents
 
 - [Fine-Tuning LLMs for Function-Calling with MLX-LM](https://medium.com/@levchevajoana/fine-tuning-a-model-for-function-calling-with-mlx-lm-d00d587e2559)
+- [A Job Postings Tool: A Guide to MLX-LM Server and Tool Use with the OpenAI Client](https://medium.com/@levchevajoana/a-job-postings-tool-a-guide-to-mlx-lm-server-and-tool-use-with-the-openai-client-edb9a5d75b4c)
 
 ### VLMs
 

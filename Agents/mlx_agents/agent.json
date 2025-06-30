@@ -1,5 +1,5 @@
 {
-    "model": "mlx-community/qwen3-4b-bf16",
+    "model": "mlx-community/Qwen3-8B-8bit",
     "endpointUrl": "http://localhost:8080/v1",
     "servers": [
         {
