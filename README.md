@@ -107,7 +107,7 @@ Apple:
 - [Distillation Scaling Laws](https://arxiv.org/abs/2502.08606)
 - [Parameters vs FLOPs: Scaling Laws for Optimal Sparsity for Mixture-of-Experts Language Models](https://arxiv.org/abs/2501.12370)
 - [Reversal Blessing: Thinking Backward May Outpace Thinking Forward in Multi-choice Questions](https://arxiv.org/abs/2502.18435v2)
-- [FastVLM: Efficient Vision Encoding for Vision Language Models]([https://www.arxiv.org/pdf/2412.13303](https://www.arxiv.org/abs/2412.13303))
+- [FastVLM: Efficient Vision Encoding for Vision Language Models](https://www.arxiv.org/abs/2412.13303)
 
 Misc:
 - [Scaling Pre-training to One Hundred Billion Data for Vision Language Models](https://arxiv.org/abs/2502.07617)
