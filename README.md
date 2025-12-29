@@ -49,6 +49,7 @@ Agents:
 - [ai-agents-for-beginners (Microsoft)](https://github.com/microsoft/ai-agents-for-beginners)
 - [Agents (Google's whitepaper)](https://www.kaggle.com/whitepaper-agents)
 - [Agency Is Frame-Dependent](https://arxiv.org/abs/2502.04403)
+- [Agent Lightning: Train ANY AI Agents with Reinforcement Learning](https://arxiv.org/abs/2508.03680)
 
 Promptning:
 - [Prompt Engineering (Google's whitepaper)](https://www.kaggle.com/whitepaper-prompt-engineering)
@@ -181,3 +182,7 @@ Blogs/Posts:
 - [Transformers from Scratch](https://www.brandonrohrer.com/transformers)
 - [Chain of Thought](https://www.k-a.in/cot.html)
 - [Deekshith Dade](https://deekshith.me)
+
+Frameworks:
+- [Agno](https://www.agno.com), and [github page](https://github.com/agno-agi/agno)
+- [Agent Lightning](https://github.com/microsoft/agent-lightning)
