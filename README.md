@@ -11,27 +11,27 @@ The **LLMs-Journey** repository covers topics including:
 
 ## Blog Posts
 
-### Fine-Tuning
+Fine-Tuning:
 
 - [Fine-Tuning LLMs with LoRA and MLX-LM](https://medium.com/@levchevajoana/fine-tuning-llms-with-lora-and-mlx-lm-c0b143642deb)
 
 
-### Agents
+Agents:
 
 - [Fine-Tuning LLMs for Function-Calling with MLX-LM](https://medium.com/@levchevajoana/fine-tuning-a-model-for-function-calling-with-mlx-lm-d00d587e2559)
 - [A Job Postings Tool: A Guide to MLX-LM Server and Tool Use with the OpenAI Client](https://medium.com/@levchevajoana/a-job-postings-tool-a-guide-to-mlx-lm-server-and-tool-use-with-the-openai-client-edb9a5d75b4c)
 
-### VLMs
+VLMs:
 
 - [Qwen2.5-VL with MLX-VLM](https://medium.com/@levchevajoana/qwen2-5-vl-with-mlx-vlm-c4329b40ab87)
 - [Image Segmentation with PaliGemma 2 Mix and MLX](https://medium.com/@levchevajoana/image-segmentation-with-paligemma-2-mix-and-mlx-7e69e077968b)
 - [Image Segmentation with PaliGemma 2 mix, Transformers, Docker, FastAPI, and GitHub Actions](https://medium.com/@levchevajoana/image-segmentation-with-paligemma-2-mix-transformers-docker-fastapi-and-github-actions-ff6d00253832)
 
-### On-Device AI
+On-Device AI:
 
 - [Chat with Qwen3 on your iPhone: A Step-by-Step Guide](https://medium.com/@levchevajoana/chat-with-qwen3-on-your-iphone-a-step-by-step-guide-515bb957cd02)
 
-### Misc
+Misc:
 
 - [Thinking Backwards: The “Reversal Blessing” in LLM Multiple-Choice Reasoning](https://medium.com/@levchevajoana/thinking-backwards-the-reversal-blessing-in-llm-multiple-choice-reasoning-fa71916b51e5)
 
@@ -178,3 +178,4 @@ Blogs/Posts:
 - [The Illustrated DeepSeek-R1](https://newsletter.languagemodels.co/p/the-illustrated-deepseek-r1)
 - [Transformers from Scratch](https://www.brandonrohrer.com/transformers)
 - [Chain of Thought](https://www.k-a.in/cot.html)
+- [Deekshith Dade](https://deekshith.me)
