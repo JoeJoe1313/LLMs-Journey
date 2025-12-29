@@ -98,6 +98,7 @@ Vision:
 - [DeepSeek-OCR: Contexts Optical Compression](https://arxiv.org/abs/2510.18234)
 - [olmOCR: Unlocking Trillions of Tokens in PDFs with Vision Language Models](https://arxiv.org/abs/2502.18443)
 - [olmOCR 2: Unit Test Rewards for Document OCR](https://arxiv.org/abs/2510.19817)
+- [dots.ocr: Multilingual Document Layout Parsing in a Single Vision-Language Model](https://www.arxiv.org/abs/2512.02498)
 
 Chain-of-Thought
 - [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
