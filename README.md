@@ -20,12 +20,14 @@ Agents:
 
 - [Fine-Tuning LLMs for Function-Calling with MLX-LM](https://medium.com/@levchevajoana/fine-tuning-a-model-for-function-calling-with-mlx-lm-d00d587e2559)
 - [A Job Postings Tool: A Guide to MLX-LM Server and Tool Use with the OpenAI Client](https://medium.com/@levchevajoana/a-job-postings-tool-a-guide-to-mlx-lm-server-and-tool-use-with-the-openai-client-edb9a5d75b4c)
+- [Running Local Hugging Face Models with MLX-LM and the Agno Agentic Framework](https://medium.com/@levchevajoana/running-local-hugging-face-models-with-mlx-lm-and-the-agno-agentic-framework-de134259d34d)
 
 VLMs:
 
 - [Qwen2.5-VL with MLX-VLM](https://medium.com/@levchevajoana/qwen2-5-vl-with-mlx-vlm-c4329b40ab87)
 - [Image Segmentation with PaliGemma 2 Mix and MLX](https://medium.com/@levchevajoana/image-segmentation-with-paligemma-2-mix-and-mlx-7e69e077968b)
 - [Image Segmentation with PaliGemma 2 mix, Transformers, Docker, FastAPI, and GitHub Actions](https://medium.com/@levchevajoana/image-segmentation-with-paligemma-2-mix-transformers-docker-fastapi-and-github-actions-ff6d00253832)
+- [Nanonets OCR: A Small Gem for Handwritten Notes](https://medium.com/@levchevajoana/nanonets-ocr-a-small-gem-for-handwritten-notes-3fd069b76e78)
 
 On-Device AI:
 
