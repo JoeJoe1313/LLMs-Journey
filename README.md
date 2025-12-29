@@ -83,6 +83,7 @@ Vision:
 - [Qwen2.5-VL](https://github.com/QwenLM/Qwen2.5-VL?tab=readme-ov-file) and [paper](https://arxiv.org/abs/2502.13923)
 - [Janus-Pro: Unified Multimodal Understanding and Generation with Data and Model Scaling](https://github.com/deepseek-ai/Janus/blob/main/janus_pro_tech_report.pdf)
 - [Magma: A Foundation Model for Multimodal AI Agents](https://arxiv.org/abs/2502.13130)
+- [SigLIP 2: Multilingual Vision-Language Encoders with Improved Semantic Understanding, Localization, and Dense Features](https://arxiv.org/abs/2502.14786)
 - [PaliGemma 2: A Family of Versatile VLMs for Transfer](https://arxiv.org/abs/2412.03555v1)
 - [Florence-2: Advancing a Unified Representation for a Variety of Vision Tasks](https://arxiv.org/abs/2311.06242)
 - [Kimi-VL Technical Report](https://arxiv.org/abs/2504.07491)
@@ -94,6 +95,9 @@ Vision:
 - [Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture](https://arxiv.org/abs/2301.08243)
 - [LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics](https://arxiv.org/abs/2511.08544)
 - [VL-JEPA: Joint Embedding Predictive Architecture for Vision-language](https://arxiv.org/abs/2512.10942)
+- [DeepSeek-OCR: Contexts Optical Compression](https://arxiv.org/abs/2510.18234)
+- [olmOCR: Unlocking Trillions of Tokens in PDFs with Vision Language Models](https://arxiv.org/abs/2502.18443)
+- [olmOCR 2: Unit Test Rewards for Document OCR](https://arxiv.org/abs/2510.19817)
 
 Chain-of-Thought
 - [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
@@ -133,7 +137,6 @@ Misc:
 - [Towards an AI co-scientist](https://arxiv.org/abs/2502.18864)
 - [On the consistent reasoning paradox of intelligence and optimal trust in AI: The power of 'I don't know'](https://arxiv.org/abs/2408.02357)
 - [LIMO: Less is More for Reasoning](https://arxiv.org/abs/2502.03387)
-- [SigLIP 2: Multilingual Vision-Language Encoders with Improved Semantic Understanding, Localization, and Dense Features](https://arxiv.org/abs/2502.14786)
 - [How new data permeates LLM knowledge and how to dilute it](https://arxiv.org/abs/2504.09522)
 - [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 
