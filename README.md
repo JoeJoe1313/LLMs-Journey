@@ -144,6 +144,7 @@ Misc:
 - [LIMO: Less is More for Reasoning](https://arxiv.org/abs/2502.03387)
 - [How new data permeates LLM knowledge and how to dilute it](https://arxiv.org/abs/2504.09522)
 - [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
+- [mHC: Manifold-Constrained Hyper-Connections](https://arxiv.org/abs/2512.24880)
 
 ## Resources
 
