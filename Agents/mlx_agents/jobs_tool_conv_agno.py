@@ -1,18 +1,29 @@
+import json
 import logging
 import re
 from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
 
 import requests
 from agno.agent import Agent
 from agno.models.openai.like import OpenAILike
 from agno.tools import tool
+from agno.tools.user_control_flow import UserControlFlowTools
+from agno.workflow import Workflow
+from agno.workflow.step import Step
+from agno.workflow.types import StepInput, StepOutput
 from bs4 import BeautifulSoup
+from rich.console import Console
+from rich.markdown import Markdown
+from rich.prompt import Prompt
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
-MODEL = "mlx-community/Qwen3-8B-8bit"
+MODEL = "mlx-community/Qwen3-4B-Instruct-2507-bf16"
+MAX_PAGES = 15
+DEFAULT_REQUEST = "Find jobs on dev.bg."
 
 
 def parse_bg_date(date_text: str) -> datetime:
@@ -37,7 +48,6 @@ def parse_bg_date(date_text: str) -> datetime:
         raise ValueError(f"Invalid date format: {date_text}")
 
     day, month = date_parts
-
     current_year = datetime.now().year
 
     month_num = bg_months.get(month.lower())
@@ -45,41 +55,10 @@ def parse_bg_date(date_text: str) -> datetime:
         raise ValueError(f"Invalid month: {month}")
 
     date_str = f"{current_year}-{month_num}-{day.zfill(2)}"
-
     return datetime.strptime(date_str, "%Y-%m-%d")
 
 
-def filter_jobs_by_date(jobs: list, target_date: str = None) -> list:
-    """
-    Filter jobs by target date.
-    Args:
-        jobs: List of job dictionaries.
-        target_date: Target date string in 'YYYY-MM-DD' format.
-    """
-    if not target_date:
-        target_date = datetime.now().strftime("%Y-%m-%d")
-
-    target_dt = datetime.strptime(target_date, "%Y-%m-%d")
-    filtered_jobs = []
-
-    for job in jobs:
-        try:
-            date_elem = job.find("span", class_="date")
-            if not date_elem:
-                continue
-
-            job_date = parse_bg_date(date_elem.get_text(strip=True))
-
-            if job_date.date() == target_dt.date():
-                filtered_jobs.append(job)
-        except (ValueError, AttributeError) as e:
-            log.error(f"Error parsing date: {e}")
-            continue
-
-    return filtered_jobs
-
-
-def parse_date(date_str):
+def parse_date(date_str: str) -> datetime:
     """Parse date string and return datetime object."""
     if date_str.lower() == "today":
         return datetime.now()
@@ -91,7 +70,7 @@ def parse_date(date_str):
         return datetime.now()
 
 
-def get_category_mapping():
+def get_category_mapping() -> Dict[str, str]:
     """Map common category names to dev.bg category parameters."""
     return {
         "data science": "data-science",
@@ -102,7 +81,7 @@ def get_category_mapping():
     }
 
 
-def scrape_dev_bg_jobs(category, target_date):
+def scrape_dev_bg_jobs(category: str, target_date: datetime):
     """Scrape jobs from dev.bg for a specific category and date."""
     try:
         category_mapping = get_category_mapping()
@@ -119,14 +98,12 @@ def scrape_dev_bg_jobs(category, target_date):
         }
 
         job_listings = []
-        for page in range(1, 15):
+        for page in range(1, MAX_PAGES):
             base_url = f"https://dev.bg/company/jobs/{category_param}?_paged={page}"
-
             response = requests.get(base_url, headers=headers, timeout=10)
             response.raise_for_status()
 
             soup = BeautifulSoup(response.content, "html.parser")
-
             job_containers = soup.find_all(
                 "div", class_=lambda x: x and x.startswith("job-list-item")
             )
@@ -191,8 +168,7 @@ def scrape_dev_bg_jobs(category, target_date):
         return f"Error processing jobs data: {str(e)}"
 
 
-@tool(stop_after_tool_call=False)
-def get_todays_jobs(category: str, date: str = "today") -> str:
+def get_todays_jobs_data(category: str, date: str = "today") -> str:
     """Get jobs posted today or on a given date in a specific category from dev.bg."""
     try:
         target_date = parse_date(date)
@@ -226,13 +202,123 @@ def get_todays_jobs(category: str, date: str = "today") -> str:
         return f"Error getting jobs: {str(e)}"
 
 
-def build_agent() -> Agent:
+def create_panel(content, title, border_style="blue"):
+    from rich.box import HEAVY
+    from rich.panel import Panel
+
+    return Panel(
+        content,
+        title=title,
+        title_align="left",
+        border_style=border_style,
+        box=HEAVY,
+        expand=True,
+        padding=(1, 1),
+    )
+
+
+def format_step_content_for_display(step_output: StepOutput) -> str:
+    actual_content = step_output.content
+    if not actual_content:
+        return ""
+    if isinstance(actual_content, str):
+        return actual_content
+    if isinstance(actual_content, dict):
+        return f"**Structured Output:**\n\n```json\n{json.dumps(actual_content, indent=2, default=str)}\n```"
+    return str(actual_content)
+
+
+def print_step_output_recursive(
+    step_output: StepOutput,
+    step_number: int,
+    markdown: bool,
+    console: Console,
+    depth: int = 0,
+) -> None:
+    if step_output.content:
+        formatted_content = format_step_content_for_display(step_output)
+        if depth == 0:
+            title = f"Step {step_number}: {step_output.step_name} (Completed)"
+        else:
+            title = f"{'  ' * depth}└─ {step_output.step_name} (Completed)"
+        step_panel = create_panel(
+            content=Markdown(formatted_content) if markdown else formatted_content,
+            title=title,
+            border_style="orange3",
+        )
+        console.print(step_panel)
+
+    if step_output.steps:
+        for j, nested_step in enumerate(step_output.steps):
+            print_step_output_recursive(
+                nested_step, j + 1, markdown, console, depth + 1
+            )
+
+
+def render_workflow_output(
+    workflow: Workflow,
+    workflow_response,
+    input_payload: Dict[str, Any],
+    markdown: bool = True,
+) -> None:
+    console = Console()
+    workflow_info = f"**Workflow:** {workflow.name}"
+    if workflow.description:
+        workflow_info += f"\n\n**Description:** {workflow.description}"
+    workflow_info += f"\n\n**Steps:** {workflow._get_step_count()} steps"
+    if input_payload:
+        data_display = json.dumps(input_payload, indent=2, default=str)
+        workflow_info += f"\n\n**Structured Input:**\n```json\n{data_display}\n```"
+
+    workflow_panel = create_panel(
+        content=Markdown(workflow_info) if markdown else workflow_info,
+        title="Workflow Information",
+        border_style="cyan",
+    )
+    console.print(workflow_panel)
+
+    step_results = getattr(workflow_response, "step_results", None) or []
+    if step_results:
+        for i, step_output in enumerate(step_results):
+            print_step_output_recursive(step_output, i + 1, markdown, console)
+    elif workflow_response.content:
+        content = workflow_response.content
+        rendered = Markdown(str(content)) if markdown else str(content)
+        console.print(
+            create_panel(
+                content=rendered,
+                title="Workflow Result",
+                border_style="orange3",
+            )
+        )
+
+
+@tool(stop_after_tool_call=False)
+def run_job_search_workflow(category: str, date: str = "today") -> str:
+    """Run the job search workflow and return the formatted results."""
+    input_payload = normalize_search_request({"category": category, "date": date})
+    if not input_payload["category"].strip():
+        return "Missing job category. Please provide a category."
+
+    workflow = build_workflow()
+    workflow_response = workflow.run(input=input_payload)
+    render_workflow_output(workflow, workflow_response, input_payload)
+    if workflow_response.content is None:
+        return "Workflow completed with no results."
+    return str(workflow_response.content)
+
+
+def build_session_agent() -> Agent:
     return Agent(
-        instructions=(
-            "You are a helpful job search assistant. "
-            "You can use tools to find job postings on dev.bg."
-        ),
-        tools=[get_todays_jobs],
+        instructions=[
+            "You are an interactive job search assistant for dev.bg.",
+            "When you need category or date, call get_user_input for only the missing fields.",
+            "Once you have category and date, call run_job_search_workflow.",
+            "Only ask for another search if the user requests more or you believe a follow-up is useful.",
+            "If you ask for another search, first ask via get_user_input, then request new criteria if needed.",
+            "Include the tool results in your response and keep commentary brief.",
+        ],
+        tools=[UserControlFlowTools(), run_job_search_workflow],
         model=OpenAILike(
             id=MODEL,
             api_key="not-needed",
@@ -244,16 +330,215 @@ def build_agent() -> Agent:
     )
 
 
-if __name__ == "__main__":
-    agent = build_agent()
-    log.info(
-        "Job Search Assistant activated. Type 'quit' or 'exit' to end the conversation."
+def extract_search_request_from_text(text: str) -> Dict[str, str]:
+    if not text:
+        return {}
+
+    text_lower = text.lower()
+    category = None
+    date = None
+
+    match = re.search(
+        r"\bin\s+([A-Za-z][A-Za-z0-9&/\- ]+?)\s+category\b",
+        text,
+        re.IGNORECASE,
+    )
+    if match:
+        category = match.group(1).strip()
+    else:
+        category_keywords = {
+            "data science": "Data Science",
+            "machine learning": "Machine Learning",
+            "backend development": "Backend Development",
+            "back-end development": "Backend Development",
+            "backend": "Backend Development",
+            "python development": "Python Development",
+            "python": "Python Development",
+        }
+        for key, label in category_keywords.items():
+            if key in text_lower:
+                category = label
+                break
+
+    if "today" in text_lower:
+        date = "today"
+    elif "yesterday" in text_lower:
+        date = "yesterday"
+    else:
+        date_match = re.search(r"\b\d{4}-\d{2}-\d{2}\b", text)
+        if date_match:
+            date = date_match.group(0)
+
+    extracted: Dict[str, str] = {}
+    if category:
+        extracted["category"] = category
+    if date:
+        extracted["date"] = date
+    return extracted
+
+
+def parse_json_from_text(text: str) -> Optional[Dict[str, Any]]:
+    if not text:
+        return None
+
+    fenced_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL)
+    if fenced_match:
+        try:
+            return json.loads(fenced_match.group(1))
+        except json.JSONDecodeError:
+            return None
+
+    text = text.strip()
+    if text.startswith("{") and text.endswith("}"):
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            return None
+
+    brace_start = text.find("{")
+    brace_end = text.rfind("}")
+    if brace_start != -1 and brace_end != -1 and brace_end > brace_start:
+        try:
+            return json.loads(text[brace_start : brace_end + 1])
+        except json.JSONDecodeError:
+            return None
+
+    return None
+
+
+def normalize_search_request(data: Dict[str, Any]) -> Dict[str, str]:
+    category = str(data.get("category") or "").strip()
+    date = str(data.get("date") or "").strip() or "today"
+    return {"category": category, "date": date}
+
+
+def iter_user_input_requirements(run_response) -> List[Any]:
+    active = getattr(run_response, "active_requirements", None)
+    if active is None:
+        active = getattr(run_response, "requirements", None) or []
+    return [req for req in active if getattr(req, "needs_user_input", False)]
+
+
+def apply_prefill(run_response, prefill: Dict[str, str]) -> None:
+    for requirement in iter_user_input_requirements(run_response):
+        for field in requirement.user_input_schema or []:
+            if field.value is None and field.name in prefill:
+                field.value = prefill[field.name]
+
+
+def render_user_input_request(run_response) -> None:
+    console = Console()
+    header = getattr(run_response, "content", None) or "Run paused. User input is required."
+    lines = [header, "", "Required fields:"]
+
+    for requirement in iter_user_input_requirements(run_response):
+        for field in requirement.user_input_schema or []:
+            line = f"- {field.name}"
+            if field.description:
+                line += f": {field.description}"
+            if field.value is not None:
+                line += f" (provided: {field.value})"
+            lines.append(line)
+
+    panel = create_panel(
+        content=Markdown("\n".join(lines)),
+        title="Run Paused",
+        border_style="blue",
+    )
+    console.print(panel)
+
+
+def run_agent_with_user_input(agent: Agent, prompt: str) -> Any:
+    prefill = extract_search_request_from_text(prompt)
+    run_response = agent.run(prompt)
+
+    if run_response.is_paused and prefill:
+        apply_prefill(run_response, prefill)
+        if not iter_user_input_requirements(run_response):
+            run_response = agent.continue_run(
+                run_response=run_response, requirements=run_response.requirements
+            )
+
+    while run_response.is_paused:
+        render_user_input_request(run_response)
+        for requirement in iter_user_input_requirements(run_response):
+            for field in requirement.user_input_schema or []:
+                if field.value is not None:
+                    continue
+                prompt_text = field.name
+                if field.description:
+                    prompt_text += f" ({field.description})"
+                field.value = Prompt.ask(prompt_text)
+
+        run_response = agent.continue_run(
+            run_response=run_response, requirements=run_response.requirements
+        )
+
+    return run_response
+
+
+def get_response_text(run_response) -> str:
+    content = getattr(run_response, "content", None)
+    if content:
+        return str(content)
+    messages = getattr(run_response, "messages", None) or []
+    for message in reversed(messages):
+        if getattr(message, "role", None) == "assistant" and message.content:
+            return str(message.content)
+    return ""
+
+
+def format_search_request(step_input: StepInput) -> StepOutput:
+    input_data: Dict[str, Any] = {}
+    if isinstance(step_input.input, dict):
+        input_data = step_input.input
+    elif isinstance(step_input.input, str):
+        input_data = parse_json_from_text(step_input.input) or {}
+
+    normalized = normalize_search_request(input_data)
+    return StepOutput(content=json.dumps(normalized, indent=2))
+
+
+def fetch_jobs(step_input: StepInput) -> StepOutput:
+    formatted = step_input.get_step_content("Format Search Request")
+    normalized: Dict[str, Any] = {}
+
+    if isinstance(formatted, dict):
+        normalized = formatted
+    elif isinstance(formatted, str):
+        normalized = parse_json_from_text(formatted) or {}
+
+    normalized = normalize_search_request(normalized)
+    category = normalized.get("category", "").strip()
+    date = normalized.get("date", "today")
+    if not category:
+        return StepOutput(content="Missing job category. Please try again.")
+
+    return StepOutput(content=get_todays_jobs_data(category=category, date=date))
+
+
+def build_workflow() -> Workflow:
+    return Workflow(
+        name="Job Search Workflow",
+        description="Normalize job search criteria and fetch dev.bg results.",
+        steps=[
+            Step(name="Format Search Request", executor=format_search_request),
+            Step(name="Fetch Jobs", executor=fetch_jobs),
+        ],
     )
 
-    while True:
-        user_input = input("You: ")
-        if user_input.lower() in ["quit", "exit"]:
-            log.info("Assistant: Goodbye!")
-            break
 
-        agent.print_response(user_input)
+if __name__ == "__main__":
+    user_input = Prompt.ask("Job search request", default=DEFAULT_REQUEST)
+    agent = build_session_agent()
+    run_response = run_agent_with_user_input(agent, user_input)
+    response_text = get_response_text(run_response)
+    if response_text:
+        console = Console()
+        console.print(
+            create_panel(
+                content=Markdown(response_text),
+                title="Assistant Response",
+                border_style="green",
+            )
+        )
