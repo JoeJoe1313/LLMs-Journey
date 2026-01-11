@@ -148,7 +148,7 @@ Misc:
 - [How new data permeates LLM knowledge and how to dilute it](https://arxiv.org/abs/2504.09522)
 - [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 - [mHC: Manifold-Constrained Hyper-Connections](https://arxiv.org/abs/2512.24880)
-- [GDPO: Group reward-Decoupled Normalization Policy Optimization for Multi-reward RL Optimization](https://arxiv.org/abs/2601.05242)
+- [GDPO: Group reward-Decoupled Normalization Policy Optimization for Multi-reward RL Optimization](https://arxiv.org/abs/2601.05242), [GitHub](https://github.com/NVlabs/GDPO)
 
 ## Resources
 
