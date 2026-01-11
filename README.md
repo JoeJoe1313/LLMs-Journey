@@ -40,6 +40,9 @@ Misc:
 ## What to read?
 
 Books:
+- [AI Engineering by Chip Huyen](https://www.oreilly.com/library/view/ai-engineering/9781098166298/)
+- [Hands-On Large Language Models by Jay Alammar, Maarten Grootendorst](https://www.oreilly.com/library/view/hands-on-large-language/9781098150952/), [GitHub](https://github.com/HandsOnLLM/Hands-On-Large-Language-Models)
+- [THE HUNDRED-PAGE LANGUAGE MODELS BOOK by Andriy Burkov](https://thelmbook.com), [GitHub](https://github.com/aburkov/theLMbook)
 - [Foundations of Large Language Models](https://arxiv.org/pdf/2501.09223)
 - [How to Scale Your Model](https://jax-ml.github.io/scaling-book/index)
 - [The Ultra-Scale Playbook: Training LLMs on GPU Clusters](https://huggingface.co/spaces/nanotron/ultrascale-playbook)
@@ -145,6 +148,7 @@ Misc:
 - [How new data permeates LLM knowledge and how to dilute it](https://arxiv.org/abs/2504.09522)
 - [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 - [mHC: Manifold-Constrained Hyper-Connections](https://arxiv.org/abs/2512.24880)
+- [GDPO: Group reward-Decoupled Normalization Policy Optimization for Multi-reward RL Optimization](https://arxiv.org/abs/2601.05242)
 
 ## Resources
 
