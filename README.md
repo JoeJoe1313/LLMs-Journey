@@ -83,6 +83,7 @@ Models:
 - [RoFormer: Enhanced Transformer with Rotary Position Embedding](https://arxiv.org/pdf/2104.09864) and [Round and Round We Go! What makes Rotary Positional Encodings useful?](https://arxiv.org/pdf/2410.06205)
 - [Qwen2.5-Math](https://github.com/QwenLM/Qwen2.5-Math?tab=readme-ov-file) and [paper](https://arxiv.org/abs/2409.12122)
 - [Kimi K2: Open Agentic Intelligence](https://arxiv.org/abs/2507.20534)
+- [LFM2 Technical Report](https://arxiv.org/abs/2511.23404)
 
 Vision:
 - [Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution](https://arxiv.org/abs/2409.12191)
