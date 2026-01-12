@@ -426,19 +426,29 @@ def apply_prefill(run_response, prefill: Dict[str, str]) -> None:
                 field.value = prefill[field.name]
 
 
+def get_missing_user_inputs(run_response) -> List[Any]:
+    missing_fields: List[Any] = []
+    for requirement in iter_user_input_requirements(run_response):
+        for field in requirement.user_input_schema or []:
+            if field.value is None:
+                missing_fields.append(field)
+    return missing_fields
+
+
 def render_user_input_request(run_response) -> None:
+    missing_fields = get_missing_user_inputs(run_response)
+    if not missing_fields:
+        return
+
     console = Console()
     header = getattr(run_response, "content", None) or "Run paused. User input is required."
     lines = [header, "", "Required fields:"]
 
-    for requirement in iter_user_input_requirements(run_response):
-        for field in requirement.user_input_schema or []:
-            line = f"- {field.name}"
-            if field.description:
-                line += f": {field.description}"
-            if field.value is not None:
-                line += f" (provided: {field.value})"
-            lines.append(line)
+    for field in missing_fields:
+        line = f"- {field.name}"
+        if field.description:
+            line += f": {field.description}"
+        lines.append(line)
 
     panel = create_panel(
         content=Markdown("\n".join(lines)),
@@ -454,12 +464,18 @@ def run_agent_with_user_input(agent: Agent, prompt: str) -> Any:
 
     if run_response.is_paused and prefill:
         apply_prefill(run_response, prefill)
-        if not iter_user_input_requirements(run_response):
+        if not get_missing_user_inputs(run_response):
             run_response = agent.continue_run(
                 run_response=run_response, requirements=run_response.requirements
             )
 
     while run_response.is_paused:
+        if not get_missing_user_inputs(run_response):
+            run_response = agent.continue_run(
+                run_response=run_response, requirements=run_response.requirements
+            )
+            continue
+
         render_user_input_request(run_response)
         for requirement in iter_user_input_requirements(run_response):
             for field in requirement.user_input_schema or []:
