@@ -312,6 +312,7 @@ def build_session_agent() -> Agent:
     return Agent(
         instructions=[
             "You are an interactive job search assistant for dev.bg.",
+            "Never ask for missing details directly; always use get_user_input.",
             "When you need category or date, call get_user_input for only the missing fields.",
             "Once you have category and date, call run_job_search_workflow.",
             "Only ask for another search if the user requests more or you believe a follow-up is useful.",
@@ -441,7 +442,9 @@ def render_user_input_request(run_response) -> None:
         return
 
     console = Console()
-    header = getattr(run_response, "content", None) or "Run paused. User input is required."
+    header = (
+        getattr(run_response, "content", None) or "Run paused. User input is required."
+    )
     lines = [header, "", "Required fields:"]
 
     for field in missing_fields:
@@ -460,7 +463,31 @@ def render_user_input_request(run_response) -> None:
 
 def run_agent_with_user_input(agent: Agent, prompt: str) -> Any:
     prefill = extract_search_request_from_text(prompt)
-    run_response = agent.run(prompt)
+    required_fields = {"category", "date"}
+    missing_fields = required_fields - set(prefill.keys())
+
+    previous_tool_choice = agent.tool_choice
+    if missing_fields:
+        agent.tool_choice = {"type": "function", "function": {"name": "get_user_input"}}
+
+    try:
+        run_response = agent.run(prompt)
+    finally:
+        agent.tool_choice = previous_tool_choice
+
+    if missing_fields and not run_response.is_paused:
+        nudge = (
+            "Missing required fields: "
+            + ", ".join(sorted(missing_fields))
+            + ". Use get_user_input to request ONLY those fields. "
+            + "Do not ask in plain text."
+        )
+        previous_tool_choice = agent.tool_choice
+        agent.tool_choice = {"type": "function", "function": {"name": "get_user_input"}}
+        try:
+            run_response = agent.run(f"{prompt}\n\n{nudge}")
+        finally:
+            agent.tool_choice = previous_tool_choice
 
     if run_response.is_paused and prefill:
         apply_prefill(run_response, prefill)
