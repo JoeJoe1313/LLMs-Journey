@@ -10,9 +10,11 @@ from agno.agent import Agent
 from agno.db.sqlite import SqliteDb
 from agno.models.openai.like import OpenAILike
 from agno.os import AgentOS
+from agno.registry import Registry
 from agno.tools import tool
 from agno.tools.user_control_flow import UserControlFlowTools
 from bs4 import BeautifulSoup
+from pydantic import BaseModel, Field
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.prompt import Prompt
@@ -22,11 +24,14 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
 MODEL = "mlx-community/Qwen3-4B-Instruct-2507-bf16"
+MODEL_BASE_URL = "http://localhost:8080/v1"
 MAX_PAGES = 15
 DEFAULT_REQUEST = "Find jobs on dev.bg."
 AGENT_ID = "dev-bg-job-search-agent"
 AGENTOS_ID = "mlx-job-search-agentos"
-AGENTOS_HOST = "127.0.0.1"
+REGISTRY_NAME = "MLX Job Search Studio Registry"
+DB_ID = "dev-bg-job-search-db"
+AGENTOS_HOST = "localhost"
 AGENTOS_PORT = 7777
 AGNO_RUNTIME_DIR = Path(__file__).resolve().parent / ".agno"
 AGNO_DB_FILE = AGNO_RUNTIME_DIR / "jobs_tool_conv_agno.db"
@@ -34,10 +39,67 @@ AGNO_DB_FILE = AGNO_RUNTIME_DIR / "jobs_tool_conv_agno.db"
 
 def build_shared_db() -> SqliteDb:
     AGNO_RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
-    return SqliteDb(db_file=str(AGNO_DB_FILE))
+    return SqliteDb(db_file=str(AGNO_DB_FILE), id=DB_ID)
 
 
 AGNO_DB = build_shared_db()
+
+
+class JobSearchRequestSchema(BaseModel):
+    request: str = Field(
+        ...,
+        description="Free-form job search request, for example 'Find data science jobs from today'.",
+    )
+    category: str = Field(
+        default="",
+        description="Optional explicit category override such as Data Science or Backend Development.",
+    )
+    date: str = Field(
+        default="today",
+        description="Optional date override. Use today, yesterday, or YYYY-MM-DD.",
+    )
+
+
+def build_model() -> OpenAILike:
+    return OpenAILike(
+        id=MODEL,
+        name="Local MLX Qwen3 4B Instruct",
+        provider="OpenAI-compatible",
+        api_key="not-needed",
+        base_url=MODEL_BASE_URL,
+        temperature=0.2,
+        max_tokens=2000,
+        max_completion_tokens=2000,
+    )
+
+
+def enable_openai_compatible_studio_model_support() -> None:
+    from agno.models import utils as model_utils
+
+    if getattr(model_utils, "_mlx_openai_compatible_patch_applied", False):
+        return
+
+    original_get_model_class = model_utils._get_model_class
+
+    def _patched_get_model_class(model_id: str, model_provider: str):
+        if model_provider == "openai-compatible":
+            return OpenAILike(
+                id=model_id,
+                name="Local MLX Qwen3 4B Instruct",
+                provider="OpenAI-compatible",
+                api_key="not-needed",
+                base_url=MODEL_BASE_URL,
+                temperature=0.2,
+                max_tokens=2000,
+                max_completion_tokens=2000,
+            )
+        return original_get_model_class(model_id, model_provider)
+
+    model_utils._get_model_class = _patched_get_model_class
+    model_utils._mlx_openai_compatible_patch_applied = True
+
+
+enable_openai_compatible_studio_model_support()
 
 
 def parse_bg_date(date_text: str) -> datetime:
@@ -290,14 +352,7 @@ def build_session_agent(db: Optional[SqliteDb] = None) -> Agent:
             "Include the tool results in your response and keep commentary brief.",
         ],
         tools=[UserControlFlowTools(), search_devbg_jobs],
-        model=OpenAILike(
-            id=MODEL,
-            api_key="not-needed",
-            base_url="http://localhost:8080/v1",
-            temperature=0.2,
-            max_tokens=2000,
-            max_completion_tokens=2000,
-        ),
+        model=build_model(),
     )
 
 
@@ -319,14 +374,7 @@ def build_agent_os_agent(db: Optional[SqliteDb] = None) -> Agent:
             "Keep any extra commentary brief.",
         ],
         tools=[search_jobs_from_request],
-        model=OpenAILike(
-            id=MODEL,
-            api_key="not-needed",
-            base_url="http://localhost:8080/v1",
-            temperature=0.2,
-            max_tokens=2000,
-            max_completion_tokens=2000,
-        ),
+        model=build_model(),
     )
 
 
@@ -501,13 +549,40 @@ def get_response_text(run_response) -> str:
     return ""
 
 
+def build_registry(
+    db: Optional[SqliteDb] = None, agent: Optional[Agent] = None
+) -> Registry:
+    db_instance = db or AGNO_DB
+    studio_agent = agent or build_agent_os_agent(db=db_instance)
+    return Registry(
+        name=REGISTRY_NAME,
+        description="Studio registry for the local MLX dev.bg job search app.",
+        tools=[
+            UserControlFlowTools(),
+            search_devbg_jobs,
+            search_jobs_from_request,
+        ],
+        models=[build_model()],
+        dbs=[db_instance],
+        schemas=[JobSearchRequestSchema],
+        functions=[
+            resolve_search_request,
+            normalize_search_request,
+            parse_date,
+        ],
+        agents=[studio_agent],
+    )
+
+
 def build_agent_os() -> AgentOS:
+    studio_agent = build_agent_os_agent(db=AGNO_DB)
     return AgentOS(
         id=AGENTOS_ID,
         name="MLX Job Search AgentOS",
-        description="AgentOS app for the dev.bg job search assistant.",
+        description="AgentOS app for the dev.bg job search assistant with Studio registry support.",
         db=AGNO_DB,
-        agents=[build_agent_os_agent(db=AGNO_DB)],
+        agents=[studio_agent],
+        registry=build_registry(db=AGNO_DB, agent=studio_agent),
     )
 
 
