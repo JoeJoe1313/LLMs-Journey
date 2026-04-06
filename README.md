@@ -21,6 +21,8 @@ Agents:
 - [Fine-Tuning LLMs for Function-Calling with MLX-LM](https://medium.com/@levchevajoana/fine-tuning-a-model-for-function-calling-with-mlx-lm-d00d587e2559)
 - [A Job Postings Tool: A Guide to MLX-LM Server and Tool Use with the OpenAI Client](https://medium.com/@levchevajoana/a-job-postings-tool-a-guide-to-mlx-lm-server-and-tool-use-with-the-openai-client-edb9a5d75b4c)
 - [Running Local Hugging Face Models with MLX-LM and the Agno Agentic Framework](https://medium.com/@levchevajoana/running-local-hugging-face-models-with-mlx-lm-and-the-agno-agentic-framework-de134259d34d)
+- [Agno + MLX: Human-in-the-Loop User Control Flow for a Job-Search Agent](https://medium.com/@levchevajoana/agno-mlx-human-in-the-loop-user-control-flow-for-a-job-search-agent-d14ed4dcdea5)
+- [Agno + MLX + Agent Lightning: Automatic Prompt Optimization for a Job-Search Agent](https://medium.com/@levchevajoana/agno-mlx-agent-lighting-automatic-prompt-optimization-for-a-job-search-agent-80e78a0a4550)
 
 VLMs:
 
@@ -107,6 +109,8 @@ Vision:
 - [olmOCR 2: Unit Test Rewards for Document OCR](https://arxiv.org/abs/2510.19817)
 - [dots.ocr: Multilingual Document Layout Parsing in a Single Vision-Language Model](https://www.arxiv.org/abs/2512.02498)
 - [Can Large Vision Language Models Read Maps Like a Human?](https://arxiv.org/abs/2503.14607)
+- [Falcon Perception (Falcon OCR)](https://arxiv.org/abs/2603.27365), [GitHub](https://github.com/tiiuae/falcon-perception)
+- [GLM-OCR Technical Report](https://arxiv.org/abs/2603.10910), [GitHub](https://github.com/zai-org/GLM-OCR)
 
 Chain-of-Thought
 - [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
@@ -131,6 +135,7 @@ Apple:
 - [Parameters vs FLOPs: Scaling Laws for Optimal Sparsity for Mixture-of-Experts Language Models](https://arxiv.org/abs/2501.12370)
 - [Reversal Blessing: Thinking Backward May Outpace Thinking Forward in Multi-choice Questions](https://arxiv.org/abs/2502.18435v2)
 - [FastVLM: Efficient Vision Encoding for Vision Language Models](https://www.arxiv.org/abs/2412.13303)
+- [Embarrassingly Simple Self-Distillation Improves Code Generation](https://arxiv.org/abs/2604.01193), [GitHub](https://github.com/apple/ml-ssd)
 
 Misc:
 - [Scaling Pre-training to One Hundred Billion Data for Vision Language Models](https://arxiv.org/abs/2502.07617)
@@ -150,6 +155,9 @@ Misc:
 - [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 - [mHC: Manifold-Constrained Hyper-Connections](https://arxiv.org/abs/2512.24880)
 - [GDPO: Group reward-Decoupled Normalization Policy Optimization for Multi-reward RL Optimization](https://arxiv.org/abs/2601.05242), [GitHub](https://github.com/NVlabs/GDPO)
+- [Attention Residuals](https://arxiv.org/abs/2603.15031), [GitHub](https://github.com/MoonshotAI/Attention-Residuals)
+- [TurboQuant](https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/), [TurboQuant: Online Vector Quantization with Near-optimal Distortion Rate](https://arxiv.org/abs/2504.19874), [QJL: 1-Bit Quantized JL Transform for KV Cache Quantization with Zero Overhead](https://arxiv.org/abs/2406.03482), [PolarQuant: Quantizing KV Caches with Polar Transformation](https://arxiv.org/abs/2502.02617)
+
 
 ## Resources
 
