@@ -86,7 +86,8 @@ Models:
 - [Qwen2.5-Math](https://github.com/QwenLM/Qwen2.5-Math?tab=readme-ov-file) and [paper](https://arxiv.org/abs/2409.12122)
 - [Kimi K2: Open Agentic Intelligence](https://arxiv.org/abs/2507.20534)
 - [LFM2 Technical Report](https://arxiv.org/abs/2511.23404)
-- [Ornith-1.0: Self-Scaffolding LLMs for Agentic Coding](https://deep-reinforce.com/ornith_1_0.html), [HF](https://huggingface.co/deepreinforce-ai/Ornith-1.0-35B)
+- [Ornith-1.0: Self-Scaffolding LLMs for Agentic Coding](https://deep-reinforce.com/ornith_1_0.html), [🤗](https://huggingface.co/deepreinforce-ai/Ornith-1.0-35B)
+- [LFM2.5-230M: Built to Run Anywhere](https://www.liquid.ai/blog/lfm2-5-230m), [🤗](https://huggingface.co/LiquidAI/LFM2.5-230M), [Docs](https://docs.liquid.ai/lfm/models/complete-library)
 
 Vision:
 - [Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution](https://arxiv.org/abs/2409.12191)
@@ -112,6 +113,7 @@ Vision:
 - [Can Large Vision Language Models Read Maps Like a Human?](https://arxiv.org/abs/2503.14607)
 - [Falcon Perception (Falcon OCR)](https://arxiv.org/abs/2603.27365), [GitHub](https://github.com/tiiuae/falcon-perception)
 - [GLM-OCR Technical Report](https://arxiv.org/abs/2603.10910), [GitHub](https://github.com/zai-org/GLM-OCR)
+- [Baidu: Unlimited OCR Works](https://arxiv.org/abs/2606.23050), [🤗](https://huggingface.co/baidu/Unlimited-OCR)
 
 Chain-of-Thought
 - [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
