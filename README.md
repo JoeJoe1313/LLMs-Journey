@@ -86,6 +86,7 @@ Models:
 - [Qwen2.5-Math](https://github.com/QwenLM/Qwen2.5-Math?tab=readme-ov-file) and [paper](https://arxiv.org/abs/2409.12122)
 - [Kimi K2: Open Agentic Intelligence](https://arxiv.org/abs/2507.20534)
 - [LFM2 Technical Report](https://arxiv.org/abs/2511.23404)
+- [Ornith-1.0: Self-Scaffolding LLMs for Agentic Coding](https://deep-reinforce.com/ornith_1_0.html), [HF](https://huggingface.co/deepreinforce-ai/Ornith-1.0-35B)
 
 Vision:
 - [Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution](https://arxiv.org/abs/2409.12191)
@@ -157,6 +158,7 @@ Misc:
 - [GDPO: Group reward-Decoupled Normalization Policy Optimization for Multi-reward RL Optimization](https://arxiv.org/abs/2601.05242), [GitHub](https://github.com/NVlabs/GDPO)
 - [Attention Residuals](https://arxiv.org/abs/2603.15031), [GitHub](https://github.com/MoonshotAI/Attention-Residuals)
 - [TurboQuant](https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/), [TurboQuant: Online Vector Quantization with Near-optimal Distortion Rate](https://arxiv.org/abs/2504.19874), [QJL: 1-Bit Quantized JL Transform for KV Cache Quantization with Zero Overhead](https://arxiv.org/abs/2406.03482), [PolarQuant: Quantizing KV Caches with Polar Transformation](https://arxiv.org/abs/2502.02617)
+- [DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation](https://github.com/deepseek-ai/DeepSpec/blob/main/DSpark_paper.pdf), [DeepSpec](https://github.com/deepseek-ai/DeepSpec)
 
 
 ## Resources
