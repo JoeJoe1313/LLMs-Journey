@@ -89,6 +89,8 @@ Models:
 - [Ornith-1.0: Self-Scaffolding LLMs for Agentic Coding](https://deep-reinforce.com/ornith_1_0.html), [🤗](https://huggingface.co/deepreinforce-ai/Ornith-1.0-35B)
 - [LFM2.5-230M: Built to Run Anywhere](https://www.liquid.ai/blog/lfm2-5-230m), [🤗](https://huggingface.co/LiquidAI/LFM2.5-230M), [Docs](https://docs.liquid.ai/lfm/models/complete-library)
 - [Qwen-AgentWorld: Language World Models for General Agents](https://arxiv.org/abs/2606.24597), [Blog](https://qwen.ai/blog?id=qwen-agentworld), [GitHub](https://github.com/QwenLM/Qwen-AgentWorld), [🤗](https://huggingface.co/collections/Qwen/qwen-agentworld)
+- [VibeThinker-3B: Exploring the Frontier of Verifiable Reasoning in Small Language Models](https://arxiv.org/abs/2606.16140), [GitHub](https://github.com/WeiboAI/VibeThinker), [🤗](https://huggingface.co/WeiboAI/VibeThinker-3B)
+- [GLM-5.2: Built for Long-Horizon Tasks](https://z.ai/blog/glm-5.2)
 
 Vision:
 - [Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution](https://arxiv.org/abs/2409.12191)
@@ -162,14 +164,19 @@ Misc:
 - [Attention Residuals](https://arxiv.org/abs/2603.15031), [GitHub](https://github.com/MoonshotAI/Attention-Residuals)
 - [TurboQuant](https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/), [TurboQuant: Online Vector Quantization with Near-optimal Distortion Rate](https://arxiv.org/abs/2504.19874), [QJL: 1-Bit Quantized JL Transform for KV Cache Quantization with Zero Overhead](https://arxiv.org/abs/2406.03482), [PolarQuant: Quantizing KV Caches with Polar Transformation](https://arxiv.org/abs/2502.02617)
 - [DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation](https://github.com/deepseek-ai/DeepSpec/blob/main/DSpark_paper.pdf), [DeepSpec](https://github.com/deepseek-ai/DeepSpec)
+- [Sakana Fugu Technical Report](https://arxiv.org/abs/2606.21228), [Blog](https://sakana.ai/fugu-release/)
+- [TRINITY: AN EVOLVED LLM COORDINATOR](https://arxiv.org/pdf/2512.04695), [GitHub](https://github.com/nshkrdotcom/trinity_coordinator)
+- [Reinforcement learning towards broadly and persistently beneficial models](https://arxiv.org/abs/2606.24014), [Blog](https://alignment.openai.com/beneficial-rl/)
+- [Qwen-Robot Suite: A Foundation Model Suite for Physical World Intelligence](https://qwen.ai/blog?id=qwen-robotsuite)
 
 
 ## Resources
 
-MLX:
+Apple/MLX:
 - [mlx-examples](https://github.com/ml-explore/mlx-examples/tree/main)
 - [ml-explore](https://github.com/ml-explore)
 - [mlx-vlm](https://github.com/Blaizzy/mlx-vlm)
+- [apple/coreai-models](https://github.com/apple/coreai-models)
 
 LangChain:
 - [Build a Retrieval Augmented Generation (RAG) App: Part 1](https://python.langchain.com/docs/tutorials/rag/)
@@ -195,6 +202,7 @@ GitHub Repos:
 - [Data_Science_Learning_Material](https://github.com/CornelliusYW/Data_Science_Learning_Material)
 - [RAG-To-Know](https://github.com/CornelliusYW/RAG-To-Know)
 - [Docling](https://github.com/DS4SD/docling?tab=readme-ov-file)
+- [Understand-Anything](https://github.com/Egonex-AI/Understand-Anything)
 
 Blogs/Posts:
 - [The Illustrated DeepSeek-R1](https://newsletter.languagemodels.co/p/the-illustrated-deepseek-r1)
@@ -204,6 +212,8 @@ Blogs/Posts:
 - [Jackrong/Qwopus3.6-27B-v2-FP8](https://huggingface.co/Jackrong/Qwopus3.6-27B-v2-FP8)
 - [How we built the world’s fastest API for GLM-5.2](https://x.com/philipkiely/status/2069212319746506968)
 - [Boost Inference Performance up to 15x on NVIDIA Blackwell Using DFlash Speculative Decoding](https://developer.nvidia.com/blog/boost-inference-performance-up-to-15x-on-nvidia-blackwell-using-dflash-speculative-decoding/?ncid=so-twit-578984&linkId=100000427691673)
+- Anthropic: [Agentic coding and persistent returns to expertise](https://www.anthropic.com/research/claude-code-expertise)
+- Google: [Announcing the Agentic Resource Discovery specification](https://developers.googleblog.com/announcing-the-agentic-resource-discovery-specification/)
 
 Frameworks:
 - [Agno](https://www.agno.com), and [github page](https://github.com/agno-agi/agno)
