@@ -113,7 +113,7 @@ Vision:
 - [Can Large Vision Language Models Read Maps Like a Human?](https://arxiv.org/abs/2503.14607)
 - [Falcon Perception (Falcon OCR)](https://arxiv.org/abs/2603.27365), [GitHub](https://github.com/tiiuae/falcon-perception)
 - [GLM-OCR Technical Report](https://arxiv.org/abs/2603.10910), [GitHub](https://github.com/zai-org/GLM-OCR)
-- [Baidu: Unlimited OCR Works](https://arxiv.org/abs/2606.23050), [🤗](https://huggingface.co/baidu/Unlimited-OCR)
+- [Baidu: Unlimited OCR Works](https://arxiv.org/abs/2606.23050), [🤗](https://huggingface.co/baidu/Unlimited-OCR), [GitHub](https://github.com/baidu/Unlimited-OCR)
 
 Chain-of-Thought
 - [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
@@ -200,6 +200,7 @@ Blogs/Posts:
 - [Transformers from Scratch](https://www.brandonrohrer.com/transformers)
 - [Chain of Thought](https://www.k-a.in/cot.html)
 - [Deekshith Dade](https://deekshith.me)
+- [Jackrong/Qwopus3.6-27B-v2-FP8](https://huggingface.co/Jackrong/Qwopus3.6-27B-v2-FP8)
 
 Frameworks:
 - [Agno](https://www.agno.com), and [github page](https://github.com/agno-agi/agno)
