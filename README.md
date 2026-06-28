@@ -202,6 +202,8 @@ Blogs/Posts:
 - [Chain of Thought](https://www.k-a.in/cot.html)
 - [Deekshith Dade](https://deekshith.me)
 - [Jackrong/Qwopus3.6-27B-v2-FP8](https://huggingface.co/Jackrong/Qwopus3.6-27B-v2-FP8)
+- [How we built the world’s fastest API for GLM-5.2](https://x.com/philipkiely/status/2069212319746506968)
+- [Boost Inference Performance up to 15x on NVIDIA Blackwell Using DFlash Speculative Decoding](https://developer.nvidia.com/blog/boost-inference-performance-up-to-15x-on-nvidia-blackwell-using-dflash-speculative-decoding/?ncid=so-twit-578984&linkId=100000427691673)
 
 Frameworks:
 - [Agno](https://www.agno.com), and [github page](https://github.com/agno-agi/agno)
