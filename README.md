@@ -88,6 +88,7 @@ Models:
 - [LFM2 Technical Report](https://arxiv.org/abs/2511.23404)
 - [Ornith-1.0: Self-Scaffolding LLMs for Agentic Coding](https://deep-reinforce.com/ornith_1_0.html), [🤗](https://huggingface.co/deepreinforce-ai/Ornith-1.0-35B)
 - [LFM2.5-230M: Built to Run Anywhere](https://www.liquid.ai/blog/lfm2-5-230m), [🤗](https://huggingface.co/LiquidAI/LFM2.5-230M), [Docs](https://docs.liquid.ai/lfm/models/complete-library)
+- [Qwen-AgentWorld: Language World Models for General Agents](https://arxiv.org/abs/2606.24597), [Blog](https://qwen.ai/blog?id=qwen-agentworld), [GitHub](https://github.com/QwenLM/Qwen-AgentWorld), [🤗](https://huggingface.co/collections/Qwen/qwen-agentworld)
 
 Vision:
 - [Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution](https://arxiv.org/abs/2409.12191)
